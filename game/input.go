@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type UserInput int
@@ -18,7 +17,6 @@ const (
 )
 
 type KBDInput struct {
-	count     int
 	nextInput chan UserInput
 }
 
@@ -34,28 +32,21 @@ func (k *KBDInput) UserInputCh() <-chan UserInput {
 }
 
 func (k *KBDInput) inputLoop() {
-	curKey := ebiten.Key(-1)
 	for {
 		<-time.After(1000 / 60 * time.Millisecond) // every frame
-		k.count += 1
-
-		// every N frames
-		if k.count%12 == 0 {
-			keys := inpututil.AppendPressedKeys([]ebiten.Key{})
-			if len(keys) > 0 {
-				curKey = keys[0]
-			}
-			switch curKey {
-			case ebiten.KeyW, ebiten.KeyArrowUp:
-				k.nextInput <- IN_UP
-			case ebiten.KeyA, ebiten.KeyArrowLeft:
-				k.nextInput <- IN_LEFT
-			case ebiten.KeyS, ebiten.KeyArrowDown:
-				k.nextInput <- IN_DOWN
-			case ebiten.KeyD, ebiten.KeyArrowRight:
-				k.nextInput <- IN_RIGHT
-			}
-			curKey = ebiten.Key(-1)
+		switch {
+		case ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyArrowUp):
+			k.nextInput <- IN_UP
+			<-time.After(1000 / 6 * time.Millisecond)
+		case ebiten.IsKeyPressed(ebiten.KeyA) || ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
+			k.nextInput <- IN_LEFT
+			<-time.After(1000 / 6 * time.Millisecond)
+		case ebiten.IsKeyPressed(ebiten.KeyS) || ebiten.IsKeyPressed(ebiten.KeyArrowDown):
+			k.nextInput <- IN_DOWN
+			<-time.After(1000 / 6 * time.Millisecond)
+		case ebiten.IsKeyPressed(ebiten.KeyD) || ebiten.IsKeyPressed(ebiten.KeyArrowRight):
+			k.nextInput <- IN_RIGHT
+			<-time.After(1000 / 6 * time.Millisecond)
 		}
 	}
 }
