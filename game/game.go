@@ -30,7 +30,7 @@ func NewGame() *Game {
 	inDev := *NewKBDInput()
 
 	g := Game{
-		Camera:      NewCamera(DimGame),
+		Camera:      NewCamera(DimCameraTiles),
 		Map:         m001,
 		Me:          base.NewObject(base.OBJ_Me, base.Vertex{X: 6, Y: 5}),
 		InputDevice: inDev,
@@ -88,4 +88,4 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, stats)
 }
 
-func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) { return DimScreen.X, DimScreen.Y }
+func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) { return ScreenResolution.X, ScreenResolution.Y }
