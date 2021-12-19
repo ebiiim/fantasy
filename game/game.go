@@ -1,6 +1,7 @@
 package game
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -13,11 +14,10 @@ import (
 var _ ebiten.Game = (*Game)(nil)
 
 type Game struct {
-	Camera      *Camera
-	Map         *base.Map
-	Me          *base.Object
-	InputDevice KBDInput
-	InputCh     <-chan UserInput
+	Camera  *Camera
+	Map     *base.Map
+	Me      *base.Object
+	InputCh <-chan UserInput
 }
 
 func NewGame() *Game {
@@ -27,14 +27,31 @@ func NewGame() *Game {
 	}
 	m001 := base.NewMap(base.M_001, base.M_001_dim, l001)
 
-	inDev := *NewKBDInput()
+	inputCh := make(chan UserInput, 10000) // HACK
+
+	centerTile := base.Vertex{X: 7, Y: 5} // HACK: need calc camera center tile
+	kbd := NewKBDInput()
+	mouse := NewMouseInput(centerTile)
+	go kbd.StartInputLoop(context.Background())
+	go mouse.StartInputLoop(context.Background())
+	go func() {
+		kbdCh := kbd.UserInputCh()
+		mouseCh := mouse.UserInputCh()
+		for {
+			select {
+			case in := <-kbdCh:
+				inputCh <- in
+			case in := <-mouseCh:
+				inputCh <- in
+			}
+		}
+	}()
 
 	g := Game{
-		Camera:      NewCamera(DimCameraTiles),
-		Map:         m001,
-		Me:          base.NewObject(base.OBJ_Me, base.Vertex{X: 6, Y: 5}),
-		InputDevice: inDev,
-		InputCh:     inDev.UserInputCh(),
+		Camera:  NewCamera(DimCameraTiles),
+		Map:     m001,
+		Me:      base.NewObject(base.OBJ_Me, base.Vertex{X: 6, Y: 5}),
+		InputCh: inputCh,
 	}
 	return &g
 }
@@ -72,7 +89,7 @@ func (g *Game) Update() error {
 }
 
 var (
-	guide          = "Arrow/WASD: Move"
+	guide          = "Keyboard:\n  Arrow/WASD: Move\nMouse:\n  Left: Move"
 	drawTime int64 = 0
 )
 
@@ -88,4 +105,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, stats)
 }
 
-func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) { return ScreenResolution.X, ScreenResolution.Y }
+func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
+	return ScreenResolution.X, ScreenResolution.Y
+}

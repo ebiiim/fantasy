@@ -13,12 +13,12 @@ func (v0 Vertex) Sub(v Vertex) Vertex {
 	return Vertex{v0.X - v.X, v0.Y - v.Y}
 }
 
-func (v0 Vertex) Mul(n int) Vertex {
-	return Vertex{v0.X * n, v0.Y * n}
+func (v0 Vertex) Mul(v Vertex) Vertex {
+	return Vertex{v0.X * v.X, v0.Y * v.Y}
 }
 
-func (v0 Vertex) Div(n int) Vertex {
-	return Vertex{v0.X / n, v0.Y / n}
+func (v0 Vertex) Div(v Vertex) Vertex {
+	return Vertex{v0.X / v.X, v0.Y / v.Y}
 }
 
 func (v Vertex) ToIndex(dim Vertex) int {

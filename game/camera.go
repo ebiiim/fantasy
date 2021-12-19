@@ -11,7 +11,7 @@ var (
 	objSize          = 40
 	ObjectPixels     = base.Vertex{X: objSize, Y: objSize}
 	ScreenResolution = base.Vertex{X: 640, Y: 480}
-	DimCameraTiles   = ScreenResolution.Div(objSize) // (16,12)
+	DimCameraTiles   = ScreenResolution.Div(ObjectPixels) // (16,12)
 )
 
 type Camera struct {
