@@ -5,6 +5,10 @@ type Vertex struct {
 	Y int
 }
 
+func NewVertex(x, y int) Vertex {
+	return Vertex{x, y}
+}
+
 func (v0 Vertex) Add(v Vertex) Vertex {
 	return Vertex{v0.X + v.X, v0.Y + v.Y}
 }

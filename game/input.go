@@ -87,7 +87,7 @@ func (m *MouseInput) StartInputLoop(ctx context.Context) {
 			switch {
 			case ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft):
 				x, y := ebiten.CursorPosition()
-				clicked := base.Vertex{x, y}.Div(ObjectPixels)
+				clicked := base.NewVertex(x, y).Div(ObjectPixels)
 				lr := clicked.X - m.centerTile.X
 				ud := clicked.Y - m.centerTile.Y
 				if abs(lr) == abs(ud) {

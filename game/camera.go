@@ -9,8 +9,8 @@ import (
 
 var (
 	objSize          = 40
-	ObjectPixels     = base.Vertex{X: objSize, Y: objSize}
-	ScreenResolution = base.Vertex{X: 640, Y: 480}
+	ObjectPixels     = base.NewVertex(objSize, objSize)
+	ScreenResolution = base.NewVertex(640, 480)
 	DimCameraTiles   = ScreenResolution.Div(ObjectPixels) // (16,12)
 )
 
@@ -27,7 +27,7 @@ func NewCamera(dim base.Vertex) *Camera {
 }
 
 func (c *Camera) Update() error {
-	c.LeftTop = c.Center.Sub(base.Vertex{X: c.DimTiles.X/2 - 1, Y: c.DimTiles.Y/2 - 1})
+	c.LeftTop = c.Center.Sub(base.NewVertex(c.DimTiles.X/2-1, c.DimTiles.Y/2-1))
 	return nil
 }
 
@@ -40,7 +40,7 @@ func (c *Camera) DrawMap(screen *ebiten.Image, m *base.Map) {
 func (c *Camera) DrawLayer(screen *ebiten.Image, l *base.Layer) {
 	for y := 0; y < c.DimTiles.Y; y++ {
 		for x := 0; x < c.DimTiles.X; x++ {
-			loc := c.LeftTop.Add(base.Vertex{x, y})
+			loc := c.LeftTop.Add(base.NewVertex(x, y))
 			if loc.IsOutside(l.Size) {
 				c.DrawObject(screen, base.NewObject(base.OBJ_BG, loc))
 			} else {

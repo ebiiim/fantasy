@@ -29,7 +29,7 @@ func NewGame() *Game {
 
 	inputCh := make(chan UserInput, 10000) // HACK
 
-	centerTile := base.Vertex{X: 7, Y: 5} // HACK: need calc camera center tile
+	centerTile := base.NewVertex(7, 5) // HACK: need calc camera center tile
 	kbd := NewKBDInput()
 	mouse := NewMouseInput(centerTile)
 	go kbd.StartInputLoop(context.Background())
@@ -50,7 +50,7 @@ func NewGame() *Game {
 	g := Game{
 		Camera:  NewCamera(DimCameraTiles),
 		Map:     m001,
-		Me:      base.NewObject(base.OBJ_Me, base.Vertex{X: 6, Y: 5}),
+		Me:      base.NewObject(base.OBJ_Me, base.NewVertex(6, 5)),
 		InputCh: inputCh,
 	}
 	return &g
@@ -66,19 +66,19 @@ func (g *Game) Update() error {
 	case in := <-g.InputCh:
 		switch in {
 		case IN_UP:
-			if g.Map.IsMovable(base.Vertex{g.Me.Loc.X, g.Me.Loc.Y - 1}) {
+			if g.Map.IsMovable(base.NewVertex(g.Me.Loc.X, g.Me.Loc.Y-1)) {
 				g.Me.Loc.Y -= 1
 			}
 		case IN_DOWN:
-			if g.Map.IsMovable(base.Vertex{g.Me.Loc.X, g.Me.Loc.Y + 1}) {
+			if g.Map.IsMovable(base.NewVertex(g.Me.Loc.X, g.Me.Loc.Y+1)) {
 				g.Me.Loc.Y += 1
 			}
 		case IN_LEFT:
-			if g.Map.IsMovable(base.Vertex{g.Me.Loc.X - 1, g.Me.Loc.Y}) {
+			if g.Map.IsMovable(base.NewVertex(g.Me.Loc.X-1, g.Me.Loc.Y)) {
 				g.Me.Loc.X -= 1
 			}
 		case IN_RIGHT:
-			if g.Map.IsMovable(base.Vertex{g.Me.Loc.X + 1, g.Me.Loc.Y}) {
+			if g.Map.IsMovable(base.NewVertex(g.Me.Loc.X+1, g.Me.Loc.Y)) {
 				g.Me.Loc.X += 1
 			}
 		}
