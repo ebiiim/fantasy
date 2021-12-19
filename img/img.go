@@ -17,6 +17,7 @@ func init() {
 	var (
 		Me    *ebiten.Image
 		Err   *ebiten.Image
+		BG    *ebiten.Image
 		None  *ebiten.Image
 		Base  *ebiten.Image
 		Grass *ebiten.Image
@@ -29,6 +30,10 @@ func init() {
 		log.Fatal(err)
 	}
 	Err, _, err = ebitenutil.NewImageFromFile("assets/img/err.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	BG, _, err = ebitenutil.NewImageFromFile("assets/img/bg.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,6 +61,7 @@ func init() {
 	Object2Image = make(map[base.ObjectType]*ebiten.Image)
 	Object2Image[base.OBJ_Err] = Err
 	Object2Image[base.OBJ_Me] = Me
+	Object2Image[base.OBJ_BG] = BG
 	Object2Image[base.OBJ_None] = None
 	Object2Image[base.OBJ_Base] = Base
 	Object2Image[base.OBJ_Grass] = Grass

@@ -38,8 +38,15 @@ func (c *Camera) DrawMap(screen *ebiten.Image, m *base.Map) {
 }
 
 func (c *Camera) DrawLayer(screen *ebiten.Image, l *base.Layer) {
-	for _, obj := range l.Objects {
-		c.DrawObject(screen, obj)
+	for y := 0; y < c.DimGame.Y; y++ {
+		for x := 0; x < c.DimGame.X; x++ {
+			loc := c.LeftTop.Add(base.Vertex{x, y})
+			if loc.IsOutside(c.DimGame) {
+				c.DrawObject(screen, base.NewObject(base.OBJ_BG, loc))
+			} else {
+				c.DrawObject(screen, l.GetObject(loc))
+			}
+		}
 	}
 }
 
