@@ -31,8 +31,14 @@ func (c *Camera) Update() error {
 	return nil
 }
 
-func (c *Camera) DrawLayer(screen *ebiten.Image, m *base.Layer) {
-	for _, obj := range m.Objects {
+func (c *Camera) DrawMap(screen *ebiten.Image, m *base.Map) {
+	for _, l := range m.Layers {
+		c.DrawLayer(screen, l)
+	}
+}
+
+func (c *Camera) DrawLayer(screen *ebiten.Image, l *base.Layer) {
+	for _, obj := range l.Objects {
 		c.DrawObject(screen, obj)
 	}
 }

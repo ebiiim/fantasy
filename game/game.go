@@ -1,7 +1,11 @@
 package game
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 
 	"github.com/ebiiim/fantasy/base"
 )
@@ -67,11 +71,21 @@ func (g *Game) Update() error {
 	return nil
 }
 
+var (
+	guide          = "Arrow/WASD: Move"
+	drawTime int64 = 0
+)
+
 func (g *Game) Draw(screen *ebiten.Image) {
-	for _, l := range g.Map.Layers {
-		g.Camera.DrawLayer(screen, l)
-	}
+	start := time.Now()
+
+	g.Camera.DrawMap(screen, g.Map)
 	g.Camera.DrawObject(screen, g.Me)
+
+	drawTime = drawTime / 60 * 59
+	drawTime += time.Since(start).Nanoseconds() / 60
+	stats := fmt.Sprintf("TPS: %0.2f\nFPS: %0.2f\nDraw: %d us\n%s", ebiten.CurrentTPS(), ebiten.CurrentFPS(), drawTime/1000, guide)
+	ebitenutil.DebugPrint(screen, stats)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) { return DimScreen.X, DimScreen.Y }
