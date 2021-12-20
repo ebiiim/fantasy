@@ -4,7 +4,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 
 	"github.com/ebiiim/fantasy/base"
-	"github.com/ebiiim/fantasy/img"
 )
 
 var (
@@ -60,9 +59,9 @@ func (c *Camera) DrawObject(screen *ebiten.Image, obj *base.Object) {
 	drawY := ObjectPixels.Y * pos.Y
 	op.GeoM.Translate(float64(drawX), float64(drawY))
 
-	oi, ok := img.Object2Image[obj.Type]
+	oi, ok := Object2Image[obj.Type]
 	if !ok {
-		oi = img.Object2Image[base.OBJ_Err]
+		oi = Object2Image[base.OBJ_Err]
 	}
 
 	screen.DrawImage(oi, op)
