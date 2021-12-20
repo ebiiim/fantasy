@@ -11,60 +11,28 @@ import (
 )
 
 var Object2Image map[base.ObjectType]*ebiten.Image
+var object2ImageFile map[base.ObjectType]string
 
 func init() {
 	log.Println("load images")
-	var (
-		Me    *ebiten.Image
-		Err   *ebiten.Image
-		BG    *ebiten.Image
-		None  *ebiten.Image
-		Base  *ebiten.Image
-		Grass *ebiten.Image
-		Tree  *ebiten.Image
-		Box   *ebiten.Image
-	)
-	var err error
-	Me, _, err = ebitenutil.NewImageFromFile("assets/img/me.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-	Err, _, err = ebitenutil.NewImageFromFile("assets/img/err.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-	BG, _, err = ebitenutil.NewImageFromFile("assets/img/bg.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-	None, _, err = ebitenutil.NewImageFromFile("assets/img/none.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-	Grass, _, err = ebitenutil.NewImageFromFile("assets/img/grass.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-	Tree, _, err = ebitenutil.NewImageFromFile("assets/img/tree.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-	Base, _, err = ebitenutil.NewImageFromFile("assets/img/base.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-	Box, _, err = ebitenutil.NewImageFromFile("assets/img/box.png")
-	if err != nil {
-		log.Fatal(err)
-	}
+
+	object2ImageFile = make(map[base.ObjectType]string)
+	
+	object2ImageFile[base.OBJ_Err] = "assets/img/err.png"
+	object2ImageFile[base.OBJ_Me] = "assets/img/me.png"
+	object2ImageFile[base.OBJ_BG] = "assets/img/bg.png"
+	object2ImageFile[base.OBJ_None] = "assets/img/none.png"
+	object2ImageFile[base.OBJ_Base] = "assets/img/base.png"
+	object2ImageFile[base.OBJ_Grass] = "assets/img/grass.png"
+	object2ImageFile[base.OBJ_Tree] = "assets/img/tree.png"
+	object2ImageFile[base.OBJ_Box] = "assets/img/box.png"
 
 	Object2Image = make(map[base.ObjectType]*ebiten.Image)
-	Object2Image[base.OBJ_Err] = Err
-	Object2Image[base.OBJ_Me] = Me
-	Object2Image[base.OBJ_BG] = BG
-	Object2Image[base.OBJ_None] = None
-	Object2Image[base.OBJ_Base] = Base
-	Object2Image[base.OBJ_Grass] = Grass
-	Object2Image[base.OBJ_Tree] = Tree
-	Object2Image[base.OBJ_Box] = Box
+	for k, v := range object2ImageFile {
+		img, _, err := ebitenutil.NewImageFromFile(v)
+		if err != nil {
+			log.Fatal(err)
+		}
+		Object2Image[k] = img
+	}
 }
