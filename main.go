@@ -9,9 +9,12 @@ import (
 )
 
 func main() {
-	ebiten.SetWindowSize(game.ScreenResolution.X, game.ScreenResolution.Y)
-	ebiten.SetWindowTitle("fantasy")
+
 	g := game.NewGame()
+	x, y := g.Layout(0, 0)
+	ebiten.SetWindowSize(x, y)
+	ebiten.SetWindowTitle("fantasy")
+
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
 	}

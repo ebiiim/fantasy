@@ -1,4 +1,4 @@
-package game
+package camera
 
 import (
 	_ "image/png"
@@ -17,7 +17,7 @@ func init() {
 	log.Println("load images")
 
 	object2ImageFile = make(map[base.ObjectType]string)
-	
+
 	object2ImageFile[base.OBJ_Err] = "assets/img/err.png"
 	object2ImageFile[base.OBJ_Me] = "assets/img/me.png"
 	object2ImageFile[base.OBJ_BG] = "assets/img/bg.png"

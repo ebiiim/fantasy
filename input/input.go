@@ -1,4 +1,4 @@
-package game
+package input
 
 import (
 	"context"
@@ -9,40 +9,30 @@ import (
 	"github.com/ebiiim/fantasy/base"
 )
 
-type InputDevice interface {
-	ActionCh() <-chan InputAction
+type Device interface {
+	ActionCh() <-chan base.Action
 	ListenLoop(ctx context.Context)
 }
 
-type InputAction int
+var _ Device = (*JoinedDevice)(nil)
 
-const (
-	IN_UNDEF InputAction = iota
-	IN_UP
-	IN_DOWN
-	IN_LEFT
-	IN_RIGHT
-)
-
-var _ InputDevice = (*JoinedInput)(nil)
-
-type JoinedInput struct {
-	actCh chan InputAction
-	devs  []InputDevice
+type JoinedDevice struct {
+	actCh chan base.Action
+	devs  []Device
 }
 
-func NewJoinedInput(devs ...InputDevice) *JoinedInput {
-	var c JoinedInput
-	c.actCh = make(chan InputAction, 10000) // HACK
+func NewJoinedDevice(devs ...Device) *JoinedDevice {
+	var c JoinedDevice
+	c.actCh = make(chan base.Action, 10000) // HACK
 	c.devs = devs
 	return &c
 }
 
-func (c *JoinedInput) ActionCh() <-chan InputAction {
+func (c *JoinedDevice) ActionCh() <-chan base.Action {
 	return c.actCh
 }
 
-func (c *JoinedInput) ListenLoop(ctx context.Context) {
+func (c *JoinedDevice) ListenLoop(ctx context.Context) {
 	for _, dev := range c.devs {
 		dev := dev
 		go func() {
@@ -61,23 +51,23 @@ func (c *JoinedInput) ListenLoop(ctx context.Context) {
 	<-ctx.Done()
 }
 
-var _ InputDevice = (*KBDInput)(nil)
+var _ Device = (*Keyboard)(nil)
 
-type KBDInput struct {
-	actCh chan InputAction
+type Keyboard struct {
+	actCh chan base.Action
 }
 
-func NewKBDInput() *KBDInput {
-	var k KBDInput
-	k.actCh = make(chan InputAction, 10000) // HACK
+func NewKeyboard() *Keyboard {
+	var k Keyboard
+	k.actCh = make(chan base.Action, 10000) // HACK
 	return &k
 }
 
-func (k *KBDInput) ActionCh() <-chan InputAction {
+func (k *Keyboard) ActionCh() <-chan base.Action {
 	return k.actCh
 }
 
-func (k *KBDInput) ListenLoop(ctx context.Context) {
+func (k *Keyboard) ListenLoop(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -85,36 +75,40 @@ func (k *KBDInput) ListenLoop(ctx context.Context) {
 		case <-time.After(1000 / 60 * time.Millisecond): // every frame
 			switch {
 			case ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyArrowUp):
-				k.actCh <- IN_UP
+				k.actCh <- base.ACT_UP
 				<-time.After(1000 / 6 * time.Millisecond)
 			case ebiten.IsKeyPressed(ebiten.KeyA) || ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
-				k.actCh <- IN_LEFT
+				k.actCh <- base.ACT_LEFT
 				<-time.After(1000 / 6 * time.Millisecond)
 			case ebiten.IsKeyPressed(ebiten.KeyS) || ebiten.IsKeyPressed(ebiten.KeyArrowDown):
-				k.actCh <- IN_DOWN
+				k.actCh <- base.ACT_DOWN
 				<-time.After(1000 / 6 * time.Millisecond)
 			case ebiten.IsKeyPressed(ebiten.KeyD) || ebiten.IsKeyPressed(ebiten.KeyArrowRight):
-				k.actCh <- IN_RIGHT
+				k.actCh <- base.ACT_RIGHT
 				<-time.After(1000 / 6 * time.Millisecond)
 			}
 		}
 	}
 }
 
-var _ InputDevice = (*MouseInput)(nil)
+var _ Device = (*Mouse)(nil)
 
-type MouseInput struct {
+type Mouse struct {
 	centerTile base.Vertex
-	actCh      chan InputAction
+	tilePixels base.Vertex
+	actCh      chan base.Action
 }
 
-func NewMouseInput(centerTile base.Vertex) *MouseInput {
-	m := MouseInput{centerTile: centerTile}
-	m.actCh = make(chan InputAction, 10000) // HACK
+func NewMouse(centerTile, tilePixels base.Vertex) *Mouse {
+	m := Mouse{
+		centerTile,
+		tilePixels,
+		make(chan base.Action, 10000), // HACK
+	}
 	return &m
 }
 
-func (m *MouseInput) ActionCh() <-chan InputAction {
+func (m *Mouse) ActionCh() <-chan base.Action {
 	return m.actCh
 }
 
@@ -125,7 +119,7 @@ func abs(n int) int {
 	return n
 }
 
-func (m *MouseInput) ListenLoop(ctx context.Context) {
+func (m *Mouse) ListenLoop(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -134,7 +128,7 @@ func (m *MouseInput) ListenLoop(ctx context.Context) {
 			switch {
 			case ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft):
 				x, y := ebiten.CursorPosition()
-				clicked := base.NewVertex(x, y).Div(ObjectPixels)
+				clicked := base.NewVertex(x, y).Div(m.tilePixels)
 				lr := clicked.X - m.centerTile.X
 				ud := clicked.Y - m.centerTile.Y
 				if abs(lr) == abs(ud) {
@@ -142,15 +136,15 @@ func (m *MouseInput) ListenLoop(ctx context.Context) {
 				}
 				if abs(lr) < abs(ud) {
 					if ud < 0 {
-						m.actCh <- IN_UP
+						m.actCh <- base.ACT_UP
 					} else {
-						m.actCh <- IN_DOWN
+						m.actCh <- base.ACT_DOWN
 					}
 				} else {
 					if lr < 0 {
-						m.actCh <- IN_LEFT
+						m.actCh <- base.ACT_LEFT
 					} else {
-						m.actCh <- IN_RIGHT
+						m.actCh <- base.ACT_RIGHT
 					}
 				}
 				<-time.After(1000 / 6 * time.Millisecond)
