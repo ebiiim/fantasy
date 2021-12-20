@@ -14,10 +14,10 @@ import (
 var _ ebiten.Game = (*Game)(nil)
 
 type Game struct {
-	Camera  *Camera
-	Map     *base.Map
-	Me      *base.Object
-	InputCh <-chan UserInput
+	Camera   *Camera
+	Map      *base.Map
+	Me       *base.Object
+	ActionCh <-chan InputAction
 }
 
 func NewGame() *Game {
@@ -27,31 +27,17 @@ func NewGame() *Game {
 	}
 	m001 := base.NewMap(base.M_001, base.M_001_dim, l001)
 
-	inputCh := make(chan UserInput, 10000) // HACK
-
-	centerTile := base.NewVertex(7, 5) // HACK: need calc camera center tile
 	kbd := NewKBDInput()
+	centerTile := base.NewVertex(7, 5) // HACK: need calc camera center tile
 	mouse := NewMouseInput(centerTile)
-	go kbd.StartInputLoop(context.Background())
-	go mouse.StartInputLoop(context.Background())
-	go func() {
-		kbdCh := kbd.UserInputCh()
-		mouseCh := mouse.UserInputCh()
-		for {
-			select {
-			case in := <-kbdCh:
-				inputCh <- in
-			case in := <-mouseCh:
-				inputCh <- in
-			}
-		}
-	}()
+	dev := NewJoinedInput(kbd, mouse)
+	go dev.ListenLoop(context.Background())
 
 	g := Game{
-		Camera:  NewCamera(DimCameraTiles),
-		Map:     m001,
-		Me:      base.NewObject(base.OBJ_Me, base.NewVertex(6, 5)),
-		InputCh: inputCh,
+		Camera:   NewCamera(DimCameraTiles),
+		Map:      m001,
+		Me:       base.NewObject(base.OBJ_Me, base.NewVertex(6, 5)),
+		ActionCh: dev.ActionCh(),
 	}
 	return &g
 }
@@ -63,7 +49,7 @@ func (g *Game) Update() error {
 	select {
 	default:
 		// no input
-	case in := <-g.InputCh:
+	case in := <-g.ActionCh:
 		switch in {
 		case IN_UP:
 			if g.Map.IsMovable(base.NewVertex(g.Me.Loc.X, g.Me.Loc.Y-1)) {

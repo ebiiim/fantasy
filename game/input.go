@@ -9,31 +9,75 @@ import (
 	"github.com/ebiiim/fantasy/base"
 )
 
-type UserInput int
+type InputDevice interface {
+	ActionCh() <-chan InputAction
+	ListenLoop(ctx context.Context)
+}
+
+type InputAction int
 
 const (
-	IN_UNDEF UserInput = iota
+	IN_UNDEF InputAction = iota
 	IN_UP
 	IN_DOWN
 	IN_LEFT
 	IN_RIGHT
 )
 
+var _ InputDevice = (*JoinedInput)(nil)
+
+type JoinedInput struct {
+	actCh chan InputAction
+	devs  []InputDevice
+}
+
+func NewJoinedInput(devs ...InputDevice) *JoinedInput {
+	var c JoinedInput
+	c.actCh = make(chan InputAction, 10000) // HACK
+	c.devs = devs
+	return &c
+}
+
+func (c *JoinedInput) ActionCh() <-chan InputAction {
+	return c.actCh
+}
+
+func (c *JoinedInput) ListenLoop(ctx context.Context) {
+	for _, dev := range c.devs {
+		dev := dev
+		go func() {
+			go dev.ListenLoop(ctx)
+			ch := dev.ActionCh()
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case act := <-ch:
+					c.actCh <- act
+				}
+			}
+		}()
+	}
+	<-ctx.Done()
+}
+
+var _ InputDevice = (*KBDInput)(nil)
+
 type KBDInput struct {
-	nextInput chan UserInput
+	actCh chan InputAction
 }
 
 func NewKBDInput() *KBDInput {
-	k := KBDInput{}
-	k.nextInput = make(chan UserInput, 10000) // HACK
+	var k KBDInput
+	k.actCh = make(chan InputAction, 10000) // HACK
 	return &k
 }
 
-func (k *KBDInput) UserInputCh() <-chan UserInput {
-	return k.nextInput
+func (k *KBDInput) ActionCh() <-chan InputAction {
+	return k.actCh
 }
 
-func (k *KBDInput) StartInputLoop(ctx context.Context) {
+func (k *KBDInput) ListenLoop(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -41,35 +85,37 @@ func (k *KBDInput) StartInputLoop(ctx context.Context) {
 		case <-time.After(1000 / 60 * time.Millisecond): // every frame
 			switch {
 			case ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyArrowUp):
-				k.nextInput <- IN_UP
+				k.actCh <- IN_UP
 				<-time.After(1000 / 6 * time.Millisecond)
 			case ebiten.IsKeyPressed(ebiten.KeyA) || ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
-				k.nextInput <- IN_LEFT
+				k.actCh <- IN_LEFT
 				<-time.After(1000 / 6 * time.Millisecond)
 			case ebiten.IsKeyPressed(ebiten.KeyS) || ebiten.IsKeyPressed(ebiten.KeyArrowDown):
-				k.nextInput <- IN_DOWN
+				k.actCh <- IN_DOWN
 				<-time.After(1000 / 6 * time.Millisecond)
 			case ebiten.IsKeyPressed(ebiten.KeyD) || ebiten.IsKeyPressed(ebiten.KeyArrowRight):
-				k.nextInput <- IN_RIGHT
+				k.actCh <- IN_RIGHT
 				<-time.After(1000 / 6 * time.Millisecond)
 			}
 		}
 	}
 }
 
+var _ InputDevice = (*MouseInput)(nil)
+
 type MouseInput struct {
 	centerTile base.Vertex
-	nextInput  chan UserInput
+	actCh      chan InputAction
 }
 
 func NewMouseInput(centerTile base.Vertex) *MouseInput {
 	m := MouseInput{centerTile: centerTile}
-	m.nextInput = make(chan UserInput, 10000) // HACK
+	m.actCh = make(chan InputAction, 10000) // HACK
 	return &m
 }
 
-func (m *MouseInput) UserInputCh() <-chan UserInput {
-	return m.nextInput
+func (m *MouseInput) ActionCh() <-chan InputAction {
+	return m.actCh
 }
 
 func abs(n int) int {
@@ -78,7 +124,8 @@ func abs(n int) int {
 	}
 	return n
 }
-func (m *MouseInput) StartInputLoop(ctx context.Context) {
+
+func (m *MouseInput) ListenLoop(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -95,15 +142,15 @@ func (m *MouseInput) StartInputLoop(ctx context.Context) {
 				}
 				if abs(lr) < abs(ud) {
 					if ud < 0 {
-						m.nextInput <- IN_UP
+						m.actCh <- IN_UP
 					} else {
-						m.nextInput <- IN_DOWN
+						m.actCh <- IN_DOWN
 					}
 				} else {
 					if lr < 0 {
-						m.nextInput <- IN_LEFT
+						m.actCh <- IN_LEFT
 					} else {
-						m.nextInput <- IN_RIGHT
+						m.actCh <- IN_RIGHT
 					}
 				}
 				<-time.After(1000 / 6 * time.Millisecond)
