@@ -1,5 +1,7 @@
 build-wasm:	./dist/wasm/wasm_exec.js
-	GOOS=js GOARCH=wasm go build -o ./dist/wasm/a.wasm ./main.go
+	GOOS=js GOARCH=wasm go build \
+	  -o ./dist/wasm/a.wasm \
+	  -ldflags "-X \"main.version=$$(git describe --tags)\" -X \"main.buildDate=$$(date --iso-8601=seconds)\" -X \"main.goVersion=$$(go version)\"" ./main.go
 	cp ./web/* ./dist/wasm
 	cp -r ./assets/ ./dist/wasm/
 
@@ -9,3 +11,6 @@ build-wasm:	./dist/wasm/wasm_exec.js
 
 serve:
 	python -m http.server --bind 127.0.0.1 --directory ./dist/wasm 8080
+
+build-native:
+	go build -ldflags "-X \"main.version=$$(git describe --tags)\" -X \"main.buildDate=$$(date --iso-8601=seconds)\" -X \"main.goVersion=$$(go version)\"" ./main.go
