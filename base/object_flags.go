@@ -1,7 +1,5 @@
 package base
 
-import "log"
-
 var GetFlagSet map[ObjectType]FlagSet
 
 const (
@@ -29,7 +27,6 @@ const (
 )
 
 func init() {
-	log.Println("load object flags")
 	GetFlagSet = make(map[ObjectType]FlagSet)
 	GetFlagSet[OBJ_Me] = F_Me
 	GetFlagSet[OBJ_Err] = F_BlockAll

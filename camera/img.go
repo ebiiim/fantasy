@@ -14,8 +14,6 @@ var Object2Image map[base.ObjectType]*ebiten.Image
 var object2ImageFile map[base.ObjectType]string
 
 func init() {
-	log.Println("load images")
-
 	object2ImageFile = make(map[base.ObjectType]string)
 
 	object2ImageFile[base.OBJ_Err] = "assets/img/err.png"
