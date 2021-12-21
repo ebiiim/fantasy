@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"time"
 
@@ -34,7 +33,6 @@ func init() {
 	game.BuildInfo.Version = setIfEmpty(version, "dev")
 	game.BuildInfo.BuildDate = parseDateOrZero(buildDate)
 	game.BuildInfo.GoVersion = goVersion
-	fmt.Printf("%+v\n", game.BuildInfo)
 }
 
 func main() {
