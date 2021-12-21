@@ -1,7 +1,12 @@
-build: ./camera/assets build-wasm
+all: ci build
+
+ci:
+	git fetch --tags
 
 serve:
 	python -m http.server --bind 127.0.0.1 --directory ./dist/wasm 8080
+
+build: ./camera/assets build-wasm
 
 build-wasm:	./dist/wasm/wasm_exec.js
 	GOOS=js GOARCH=wasm go build \
