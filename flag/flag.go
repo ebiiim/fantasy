@@ -5,27 +5,31 @@ import "github.com/ebiiim/fantasy/base"
 type Flag uint
 
 const (
-	blockLand Flag = 1 << iota
-	blockSea
-	blockSky
-	character
-	me
-	npc
-	player
-	actionObj
+	BlockLand Flag = 1 << iota
+	BlockSea
+	BlockSky
+	IsHigh
+	IsCharacter
+	IsMe
+	IsPlayer
+	IsNPC
+	HasAction
 )
 
 const (
 	None       Flag = 0
 	All             = ^None
-	BlockAll        = blockLand | blockSky | blockSea
-	LandObject      = blockLand | blockSea
-	SeaObject       = blockLand | blockSea
-	SkyObject       = blockSky
-	Me              = me | player | character
-	Player          = player | character | actionObj
-	NPC             = npc | character | actionObj | LandObject
-	Box             = actionObj | LandObject
+	BlockAll        = BlockLand | BlockSky | BlockSea
+	Land            = BlockSea
+	Sea             = BlockLand
+	Sky             = IsHigh
+	LandObject      = Land | BlockLand
+	SeaObject       = Sea | BlockSea
+	SkyObject       = Sky | BlockSky
+	Me              = IsMe | IsPlayer | IsCharacter
+	Player          = IsPlayer | IsCharacter | HasAction
+	NPC             = IsNPC | IsCharacter | HasAction | LandObject
+	ItemBox         = HasAction | LandObject
 )
 
 var m map[base.Object]Flag

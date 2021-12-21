@@ -28,7 +28,7 @@ func (f *Field) updateLandMovable() {
 		for _, obj := range objs {
 			movable |= flag.Get(obj)
 		}
-		f.landMovable[idx] = (movable & flag.LandObject) != flag.LandObject
+		f.landMovable[idx] = (movable & flag.BlockLand) != flag.BlockLand
 	}
 }
 

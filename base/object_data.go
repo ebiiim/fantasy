@@ -10,5 +10,6 @@ const (
 	ObjGrass               // 4
 	ObjTree                // 5
 	ObjBox                 // 6
-	ObjMe                  // 7
+	ObjWater               // 7
+	ObjMe                  // 8
 )

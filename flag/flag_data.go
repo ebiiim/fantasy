@@ -8,9 +8,10 @@ func initData() {
 	m[base.ObjUndef] = BlockAll
 	m[base.ObjNone] = None
 	m[base.ObjBG] = BlockAll
-	m[base.ObjBase] = None
-	m[base.ObjGrass] = None
+	m[base.ObjBase] = Land
+	m[base.ObjGrass] = Land
 	m[base.ObjTree] = LandObject
-	m[base.ObjBox] = Box
+	m[base.ObjBox] = ItemBox
+	m[base.ObjWater] = Sea
 	m[base.ObjMe] = Me
 }
