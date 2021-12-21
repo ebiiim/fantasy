@@ -24,7 +24,7 @@ func init() {
 		return src
 	}
 	parseDateOrZero := func(s string) time.Time {
-		t, err := time.Parse(time.RFC3339, buildDate)
+		t, err := time.Parse(time.UnixDate, buildDate)
 		if err != nil {
 			return time.Time{}
 		}
