@@ -23,7 +23,7 @@ type JoinedDevice struct {
 
 func NewJoinedDevice(devs ...Device) *JoinedDevice {
 	var c JoinedDevice
-	c.actCh = make(chan base.Action, 10000) // HACK
+	c.actCh = make(chan base.Action)
 	c.devs = devs
 	return &c
 }
@@ -59,7 +59,7 @@ type Keyboard struct {
 
 func NewKeyboard() *Keyboard {
 	var k Keyboard
-	k.actCh = make(chan base.Action, 10000) // HACK
+	k.actCh = make(chan base.Action)
 	return &k
 }
 
@@ -103,7 +103,7 @@ func NewMouse(centerTile, tilePixels base.Vertex) *Mouse {
 	m := Mouse{
 		centerTile,
 		tilePixels,
-		make(chan base.Action, 10000), // HACK
+		make(chan base.Action),
 	}
 	return &m
 }

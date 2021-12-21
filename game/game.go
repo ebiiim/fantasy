@@ -30,8 +30,8 @@ var (
 var _ ebiten.Game = (*Game)(nil)
 
 type Game struct {
-	FieldCam *camera.FieldCam
 	Field    *field.Field
+	FieldCam *camera.FieldCam
 	Me       base.Object
 	MyLoc    base.Vertex
 	ActionCh <-chan base.Action
@@ -42,15 +42,15 @@ func NewGame() *Game {
 	m := base.MustLoadMap("assets/map01.yaml")
 	f := field.NewField(m)
 
+	fcam := camera.NewFieldCam(dimCameraTiles, tilePixels)
 	kbd := input.NewKeyboard()
-	camCenter := base.NewVertex(7, 5) // HACK: need calc camera center tile
-	mouse := input.NewMouse(camCenter, tilePixels)
+	mouse := input.NewMouse(fcam.CameraCenterTile(), tilePixels)
 	dev := input.NewJoinedDevice(kbd, mouse)
 	go dev.ListenLoop(context.Background())
 
 	g := Game{
-		FieldCam: camera.NewFieldCam(dimCameraTiles, tilePixels),
 		Field:    f,
+		FieldCam: fcam,
 		Me:       base.ObjMe,
 		MyLoc:    base.NewVertex(6, 5),
 		ActionCh: dev.ActionCh(),
