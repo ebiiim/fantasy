@@ -30,6 +30,11 @@ const (
 
 var m map[base.Object]Flag
 
+func init() {
+	m = make(map[base.Object]Flag)
+	initData()
+}
+
 func Get(obj base.Object) Flag {
 	v, ok := m[obj]
 	if !ok {

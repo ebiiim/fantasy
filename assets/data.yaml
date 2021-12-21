@@ -1,0 +1,27 @@
+---
+- name: ObjMe
+  img: me.png
+  flags:
+    - Me
+- name: ObjUndef
+  img: undef.png
+  flags:
+    - BlockAll
+- name: ObjNone
+  img: none.png
+- name: ObjBG
+  img: bg.png
+  flags:
+    - BlockAll
+- name: ObjBase
+  img: base.png
+- name: ObjGrass
+  img: grass.png
+- name: ObjTree
+  img: tree.png
+  flags:
+    - LandObject
+- name: ObjBox
+  img: box.png
+  flags:
+    - Box
