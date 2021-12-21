@@ -41,28 +41,9 @@ func (l *Layer) GetObjectOrError(loc Vertex) (*Object, error) {
 }
 
 func LoadLayerFromStr(s string) []ObjectType {
-	ss := strings.Split(s, "\n")
-	// preprocess
-	for idx, s := range ss {
-		if strings.HasPrefix(s, "#") {
-			s = ""
-		}
-		s = strings.ReplaceAll(s, " ", "")
-		s = strings.TrimSuffix(s, ",")
-		ss[idx] = s
-	}
-	objStr := strings.Join(ss, ",")
-	// bad hack
-	objStr = strings.ReplaceAll(objStr, ",,", ",")
-	objStr = strings.ReplaceAll(objStr, ",,", ",")
-	objStr = strings.ReplaceAll(objStr, ",,", ",")
-	objStr = strings.ReplaceAll(objStr, ",,", ",")
-	objStr = strings.ReplaceAll(objStr, ",,", ",")
-	objStr = strings.TrimPrefix(objStr, ",")
-	objStr = strings.TrimSuffix(objStr, ",")
-
-	objStrList := strings.Split(objStr, ",")
-
+	ss := strings.ReplaceAll(s, "\n", " ")
+	ss = strings.Trim(ss, " ")
+	objStrList := strings.Split(ss, " ")
 	objTypeList := make([]ObjectType, len(objStrList))
 	for idx, objStr := range objStrList {
 		v, err := strconv.Atoi(objStr)
