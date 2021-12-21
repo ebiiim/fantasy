@@ -4,6 +4,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 
 	"github.com/ebiiim/fantasy/base"
+	"github.com/ebiiim/fantasy/field"
+	"github.com/ebiiim/fantasy/img"
 )
 
 type FieldCam struct {
@@ -29,12 +31,16 @@ func NewFieldCam(dimTiles, tilePixels base.Vertex) *FieldCam {
 	return &c
 }
 
-// CalcTopLeft calcs screen top left tile's location in map.
-func (c *FieldCam) CalcTopLeft(locCenter base.Vertex) base.Vertex {
-	return locCenter.Sub(base.NewVertex(c.DimTiles.X/2-1, c.DimTiles.Y/2-1))
+func (c *FieldCam) CameraCenterTile() base.Vertex {
+	return base.NewVertex(c.DimTiles.X/2-1, c.DimTiles.Y/2-1)
 }
 
-func (c *FieldCam) DrawField(screen *ebiten.Image, f *base.Field, topLeft base.Vertex) {
+// CalcTopLeft calcs screen top left tile's location in map.
+func (c *FieldCam) CalcTopLeft(locCenter base.Vertex) base.Vertex {
+	return locCenter.Sub(c.CameraCenterTile())
+}
+
+func (c *FieldCam) DrawField(screen *ebiten.Image, f *field.Field, topLeft base.Vertex) {
 	c.DrawMap(screen, f.Map, topLeft)
 }
 
@@ -47,30 +53,24 @@ func (c *FieldCam) DrawMap(screen *ebiten.Image, m *base.Map, topLeft base.Verte
 func (c *FieldCam) DrawLayer(screen *ebiten.Image, l *base.Layer, topLeft base.Vertex) {
 	for y := 0; y < c.DimTiles.Y; y++ {
 		for x := 0; x < c.DimTiles.X; x++ {
-			loc := topLeft.Add(base.NewVertex(x, y))
+			pos := base.NewVertex(x, y)
+			loc := topLeft.Add(pos)
 			if loc.IsOutside(l.Dimension) {
-				c.DrawObject(screen, base.NewObject(base.ObjBG, loc), topLeft)
+				c.DrawObject(screen, base.ObjBG, pos)
 			} else {
-				c.DrawObject(screen, l.GetObject(loc), topLeft)
+				c.DrawObject(screen, l.GetObject(loc), pos)
 			}
 		}
 	}
 }
 
-func (c *FieldCam) DrawObject(screen *ebiten.Image, obj *base.Object, locTopLeft base.Vertex) {
-	pos := obj.Loc.Sub(locTopLeft)
+func (c *FieldCam) DrawObject(screen *ebiten.Image, obj base.Object, pos base.Vertex) {
 	if pos.IsOutside(c.DimTiles) {
 		return
 	}
-	op := &ebiten.DrawImageOptions{}
 	drawX := c.TilePixels.X * pos.X
 	drawY := c.TilePixels.X * pos.Y
+	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(drawX), float64(drawY))
-
-	oi, ok := GetImage[obj.Type]
-	if !ok {
-		oi = GetImage[base.ObjUndef]
-	}
-
-	screen.DrawImage(oi, op)
+	screen.DrawImage(img.Get(obj), op)
 }

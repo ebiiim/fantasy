@@ -6,7 +6,7 @@ ci:
 serve:
 	python -m http.server --bind 127.0.0.1 --directory ./dist/wasm 8080
 
-build: ./camera/assets build-wasm
+build: ./img/assets build-wasm
 
 build-wasm:	./dist/wasm/wasm_exec.js
 	GOOS=js GOARCH=wasm go build \
@@ -21,5 +21,5 @@ build-native:
 	mkdir -p ./dist/wasm
 	curl -L -o ./dist/wasm/wasm_exec.js https://raw.githubusercontent.com/golang/go/go1.17.5/misc/wasm/wasm_exec.js
 
-./camera/assets:
+./img/assets:
 	go generate ./...

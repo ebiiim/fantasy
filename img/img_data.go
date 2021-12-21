@@ -1,4 +1,4 @@
-package camera
+package img
 
 import (
 	"embed"
@@ -15,20 +15,19 @@ import (
 //go:embed assets/img/*
 var assets embed.FS
 
-func initRegisterImgs() map[base.ObjectType]*ebiten.Image {
+func init() {
 	load := func(file string) *ebiten.Image {
 		f, err := assets.Open(file)
 		if err != nil {
 			panic(err)
 		}
-		img, _, err := image.Decode(f)
+		im, _, err := image.Decode(f)
 		if err != nil {
 			panic(err)
 		}
-		return ebiten.NewImageFromImage(img)
+		return ebiten.NewImageFromImage(im)
 	}
-
-	m := make(map[base.ObjectType]*ebiten.Image)
+	m = make(map[base.Object]*ebiten.Image)
 
 	m[base.ObjUndef] = load("assets/img/undef.png")
 	m[base.ObjMe] = load("assets/img/me.png")
@@ -38,6 +37,4 @@ func initRegisterImgs() map[base.ObjectType]*ebiten.Image {
 	m[base.ObjGrass] = load("assets/img/grass.png")
 	m[base.ObjTree] = load("assets/img/tree.png")
 	m[base.ObjBox] = load("assets/img/box.png")
-
-	return m
 }

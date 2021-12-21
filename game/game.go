@@ -10,6 +10,7 @@ import (
 
 	"github.com/ebiiim/fantasy/base"
 	"github.com/ebiiim/fantasy/camera"
+	"github.com/ebiiim/fantasy/field"
 	"github.com/ebiiim/fantasy/input"
 )
 
@@ -30,8 +31,9 @@ var _ ebiten.Game = (*Game)(nil)
 
 type Game struct {
 	FieldCam *camera.FieldCam
-	Field    *base.Field
-	Me       *base.Object
+	Field    *field.Field
+	Me       base.Object
+	MyLoc    base.Vertex
 	ActionCh <-chan base.Action
 }
 
@@ -41,7 +43,7 @@ func NewGame() *Game {
 		base.NewLayer(base.Layer01Base, base.Map01Dim, base.LoadLayerFromStr(base.Layer01BaseStr)),
 		base.NewLayer(base.Layer01Objects, base.Map01Dim, base.LoadLayerFromStr(base.Layer01ObjectsStr)),
 	})
-	f := base.NewField(m)
+	f := field.NewField(m)
 
 	kbd := input.NewKeyboard()
 	camCenter := base.NewVertex(7, 5) // HACK: need calc camera center tile
@@ -52,7 +54,8 @@ func NewGame() *Game {
 	g := Game{
 		FieldCam: camera.NewFieldCam(dimCameraTiles, tilePixels),
 		Field:    f,
-		Me:       base.NewObject(base.ObjMe, base.NewVertex(6, 5)),
+		Me:       base.ObjMe,
+		MyLoc:    base.NewVertex(6, 5),
 		ActionCh: dev.ActionCh(),
 	}
 	return &g
@@ -68,20 +71,20 @@ func (g *Game) Update() error {
 	case in := <-g.ActionCh:
 		switch in {
 		case base.ActUp:
-			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X, g.Me.Loc.Y-1)) {
-				g.Me.Loc.Y -= 1
+			if g.Field.IsMovable(base.NewVertex(g.MyLoc.X, g.MyLoc.Y-1)) {
+				g.MyLoc.Y -= 1
 			}
 		case base.ActDown:
-			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X, g.Me.Loc.Y+1)) {
-				g.Me.Loc.Y += 1
+			if g.Field.IsMovable(base.NewVertex(g.MyLoc.X, g.MyLoc.Y+1)) {
+				g.MyLoc.Y += 1
 			}
 		case base.ActLeft:
-			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X-1, g.Me.Loc.Y)) {
-				g.Me.Loc.X -= 1
+			if g.Field.IsMovable(base.NewVertex(g.MyLoc.X-1, g.MyLoc.Y)) {
+				g.MyLoc.X -= 1
 			}
 		case base.ActRight:
-			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X+1, g.Me.Loc.Y)) {
-				g.Me.Loc.X += 1
+			if g.Field.IsMovable(base.NewVertex(g.MyLoc.X+1, g.MyLoc.Y)) {
+				g.MyLoc.X += 1
 			}
 		}
 	}
@@ -96,8 +99,8 @@ var (
 func (g *Game) Draw(screen *ebiten.Image) {
 	start := time.Now()
 
-	g.FieldCam.DrawField(screen, g.Field, g.FieldCam.CalcTopLeft(g.Me.Loc))
-	g.FieldCam.DrawObject(screen, g.Me, g.FieldCam.CalcTopLeft(g.Me.Loc))
+	g.FieldCam.DrawField(screen, g.Field, g.FieldCam.CalcTopLeft(g.MyLoc))
+	g.FieldCam.DrawObject(screen, g.Me, g.FieldCam.CameraCenterTile())
 
 	drawTime = drawTime / 60 * 59
 	drawTime += time.Since(start).Nanoseconds() / 60

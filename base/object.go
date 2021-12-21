@@ -1,16 +1,15 @@
 package base
 
-type FlagSet uint
+type Object uint
 
-type ObjectType int
+const (
+	ObjUndef Object = iota
+	ObjNone
+	ObjBG
+	ObjBase
+	ObjGrass
+	ObjTree
+	ObjBox
 
-type Object struct {
-	Type    ObjectType
-	Loc     Vertex
-	FlagSet FlagSet
-}
-
-func NewObject(objType ObjectType, v Vertex) *Object {
-	obj := Object{objType, v, GetFlagSet[objType]}
-	return &obj
-}
+	ObjMe Object = 123456789
+)

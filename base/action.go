@@ -1,6 +1,6 @@
 package base
 
-type Action int
+type Action uint
 
 const (
 	ActUndefined Action = iota

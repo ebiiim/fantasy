@@ -13,8 +13,8 @@ func NewMap(name MapName, size Vertex, layers []*Layer) *Map {
 	return &m
 }
 
-func (m *Map) GetObjects(loc Vertex) []*Object {
-	objs := make([]*Object, len(m.Layers))
+func (m *Map) GetObjects(loc Vertex) []Object {
+	objs := make([]Object, len(m.Layers))
 	for idx, layer := range m.Layers {
 		objs[idx] = layer.GetObject(loc)
 	}
