@@ -1,7 +1,7 @@
 all: ci build-wasm
 
 ci:
-	git fetch --unshallow
+	git fetch --unshallow || true
 	git fetch --tags
 
 serve:
