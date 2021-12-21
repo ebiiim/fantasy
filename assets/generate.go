@@ -1,5 +1,7 @@
 //go:generate rm -rf ../img/assets
 //go:generate cp -r img ../img/assets
+//go:generate rm -rf ../base/map
+//go:generate cp -r map ../base/assets
 //go:generate go run generate.go
 //go:generate go fmt ../base/object_data.go
 

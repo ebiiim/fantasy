@@ -39,10 +39,7 @@ type Game struct {
 
 func NewGame() *Game {
 
-	m := base.NewMap(base.Map01, base.Map01Dim, []*base.Layer{
-		base.NewLayer(base.Layer01Base, base.Map01Dim, base.LoadLayerFromStr(base.Layer01BaseStr)),
-		base.NewLayer(base.Layer01Objects, base.Map01Dim, base.LoadLayerFromStr(base.Layer01ObjectsStr)),
-	})
+	m := base.MustLoadMap("assets/map01.yaml")
 	f := field.NewField(m)
 
 	kbd := input.NewKeyboard()
