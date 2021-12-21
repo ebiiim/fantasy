@@ -1,6 +1,7 @@
 //go:generate rm -rf ../img/assets
 //go:generate cp -r img ../img/assets
 //go:generate go run generate.go
+//go:generate go fmt ../base/object_data.go
 
 package main
 
@@ -20,12 +21,19 @@ type ObjectData struct {
 	FlagStr string   `yaml:"-"`
 }
 
-func templateData(d []*ObjectData, tmpl string, dst io.Writer) error {
+func templateData(d []*ObjectData, tmpl, dst string) error {
 	tpl, err := template.ParseFiles(tmpl)
 	if err != nil {
 		return err
 	}
-	if err := tpl.Execute(dst, d); err != nil {
+
+	_ = os.Remove(dst)
+	f, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+
+	if err := tpl.Execute(f, d); err != nil {
 		return err
 	}
 	return nil
@@ -58,8 +66,15 @@ func mergeFlags(d []*ObjectData) {
 
 func main() {
 	src := "data.yaml"
-	dstFlag := "../flag/flag_data.go"
-	dstImg := "../img/img_data.go"
+
+	objTmpl := "object_data.go.tmpl"
+	objDst := "../base/object_data.go"
+
+	imgTmpl := "img_data.go.tmpl"
+	imgDst := "../img/img_data.go"
+
+	flagTmpl := "flag_data.go.tmpl"
+	flagDst := "../flag/flag_data.go"
 
 	f, err := os.Open(src)
 	if err != nil {
@@ -74,20 +89,13 @@ func main() {
 	// 	fmt.Printf("%+v\n", od)
 	// }
 
-	_ = os.Remove(dstImg)
-	fImg, err := os.Create(dstImg)
-	if err != nil {
+	if err := templateData(d, objTmpl, objDst); err != nil {
 		log.Fatal(err)
 	}
-	_ = os.Remove(dstFlag)
-	fFlag, err := os.Create(dstFlag)
-	if err != nil {
+	if err := templateData(d, imgTmpl, imgDst); err != nil {
 		log.Fatal(err)
 	}
-	if err := templateData(d, "flag_data.go.tmpl", fFlag); err != nil {
-		log.Fatal(err)
-	}
-	if err := templateData(d, "img_data.go.tmpl", fImg); err != nil {
+	if err := templateData(d, flagTmpl, flagDst); err != nil {
 		log.Fatal(err)
 	}
 }

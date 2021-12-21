@@ -1,8 +1,4 @@
 ---
-- name: ObjMe
-  img: me.png
-  flags:
-    - Me
 - name: ObjUndef
   img: undef.png
   flags:
@@ -25,3 +21,7 @@
   img: box.png
   flags:
     - Box
+- name: ObjMe
+  img: me.png
+  flags:
+    - Me

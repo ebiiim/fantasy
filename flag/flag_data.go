@@ -5,7 +5,6 @@ package flag
 import "github.com/ebiiim/fantasy/base"
 
 func initData() {
-	m[base.ObjMe] = Me
 	m[base.ObjUndef] = BlockAll
 	m[base.ObjNone] = None
 	m[base.ObjBG] = BlockAll
@@ -13,4 +12,5 @@ func initData() {
 	m[base.ObjGrass] = None
 	m[base.ObjTree] = LandObject
 	m[base.ObjBox] = Box
+	m[base.ObjMe] = Me
 }
