@@ -6,7 +6,7 @@ import (
 	"github.com/ebiiim/fantasy/base"
 )
 
-type MapCam struct {
+type FieldCam struct {
 	// DimTiles represents tiles to draw.
 	// e.g., {16,12}
 	DimTiles base.Vertex
@@ -20,8 +20,8 @@ type MapCam struct {
 	ScreenResolution base.Vertex
 }
 
-func NewMapCamera(dimTiles, tilePixels base.Vertex) *MapCam {
-	c := MapCam{
+func NewFieldCam(dimTiles, tilePixels base.Vertex) *FieldCam {
+	c := FieldCam{
 		DimTiles:         dimTiles,
 		TilePixels:       tilePixels,
 		ScreenResolution: dimTiles.Mul(tilePixels),
@@ -30,21 +30,25 @@ func NewMapCamera(dimTiles, tilePixels base.Vertex) *MapCam {
 }
 
 // CalcTopLeft calcs screen top left tile's location in map.
-func (c *MapCam) CalcTopLeft(locCenter base.Vertex) base.Vertex {
+func (c *FieldCam) CalcTopLeft(locCenter base.Vertex) base.Vertex {
 	return locCenter.Sub(base.NewVertex(c.DimTiles.X/2-1, c.DimTiles.Y/2-1))
 }
 
-func (c *MapCam) DrawMap(screen *ebiten.Image, m *base.Map, topLeft base.Vertex) {
+func (c *FieldCam) DrawField(screen *ebiten.Image, f *base.Field, topLeft base.Vertex) {
+	c.DrawMap(screen, f.Map, topLeft)
+}
+
+func (c *FieldCam) DrawMap(screen *ebiten.Image, m *base.Map, topLeft base.Vertex) {
 	for _, l := range m.Layers {
 		c.DrawLayer(screen, l, topLeft)
 	}
 }
 
-func (c *MapCam) DrawLayer(screen *ebiten.Image, l *base.Layer, topLeft base.Vertex) {
+func (c *FieldCam) DrawLayer(screen *ebiten.Image, l *base.Layer, topLeft base.Vertex) {
 	for y := 0; y < c.DimTiles.Y; y++ {
 		for x := 0; x < c.DimTiles.X; x++ {
 			loc := topLeft.Add(base.NewVertex(x, y))
-			if loc.IsOutside(l.Size) {
+			if loc.IsOutside(l.Dimension) {
 				c.DrawObject(screen, base.NewObject(base.ObjBG, loc), topLeft)
 			} else {
 				c.DrawObject(screen, l.GetObject(loc), topLeft)
@@ -53,7 +57,7 @@ func (c *MapCam) DrawLayer(screen *ebiten.Image, l *base.Layer, topLeft base.Ver
 	}
 }
 
-func (c *MapCam) DrawObject(screen *ebiten.Image, obj *base.Object, locTopLeft base.Vertex) {
+func (c *FieldCam) DrawObject(screen *ebiten.Image, obj *base.Object, locTopLeft base.Vertex) {
 	pos := obj.Loc.Sub(locTopLeft)
 	if pos.IsOutside(c.DimTiles) {
 		return

@@ -5,18 +5,18 @@ import (
 	"strings"
 )
 
-type LayerName int
+type LayerName string
 
 type Layer struct {
-	Name    LayerName
-	Size    Vertex
-	Objects []*Object
+	Name      LayerName
+	Dimension Vertex
+	Objects   []*Object
 }
 
 func NewLayer(name LayerName, size Vertex, objList []ObjectType) *Layer {
 	l := Layer{
-		Name: name,
-		Size: size,
+		Name:      name,
+		Dimension: size,
 	}
 	area := size.X * size.Y
 	l.Objects = make([]*Object, area)
@@ -27,17 +27,10 @@ func NewLayer(name LayerName, size Vertex, objList []ObjectType) *Layer {
 }
 
 func (l *Layer) GetObject(loc Vertex) *Object {
-	if loc.IsOutside(l.Size) {
+	if loc.IsOutside(l.Dimension) {
 		return NewObject(ObjUndef, loc)
 	}
-	return l.Objects[loc.ToIndex(l.Size)]
-}
-
-func (l *Layer) GetObjectOrError(loc Vertex) (*Object, error) {
-	if loc.IsOutside(l.Size) {
-		return nil, ErrNoObject
-	}
-	return l.Objects[loc.ToIndex(l.Size)], nil
+	return l.Objects[loc.ToIndex(l.Dimension)]
 }
 
 func LoadLayerFromStr(s string) []ObjectType {

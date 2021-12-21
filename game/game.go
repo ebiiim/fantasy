@@ -29,19 +29,19 @@ var (
 var _ ebiten.Game = (*Game)(nil)
 
 type Game struct {
-	MapCam   *camera.MapCam
-	Map      *base.Map
+	FieldCam *camera.FieldCam
+	Field    *base.Field
 	Me       *base.Object
 	ActionCh <-chan base.Action
 }
 
 func NewGame() *Game {
 
-	l001 := []*base.Layer{
-		base.NewLayer(base.Layer01A, base.Map01Dim, base.LoadLayerFromStr(base.Layer01AData)),
-		base.NewLayer(base.Layer01B, base.Map01Dim, base.LoadLayerFromStr(base.Layer01BData)),
-	}
-	m001 := base.NewMap(base.Map01, base.Map01Dim, l001)
+	m := base.NewMap(base.Map01, base.Map01Dim, []*base.Layer{
+		base.NewLayer(base.Layer01Base, base.Map01Dim, base.LoadLayerFromStr(base.Layer01BaseStr)),
+		base.NewLayer(base.Layer01Objects, base.Map01Dim, base.LoadLayerFromStr(base.Layer01ObjectsStr)),
+	})
+	f := base.NewField(m)
 
 	kbd := input.NewKeyboard()
 	camCenter := base.NewVertex(7, 5) // HACK: need calc camera center tile
@@ -50,8 +50,8 @@ func NewGame() *Game {
 	go dev.ListenLoop(context.Background())
 
 	g := Game{
-		MapCam:   camera.NewMapCamera(dimCameraTiles, tilePixels),
-		Map:      m001,
+		FieldCam: camera.NewFieldCam(dimCameraTiles, tilePixels),
+		Field:    f,
 		Me:       base.NewObject(base.ObjMe, base.NewVertex(6, 5)),
 		ActionCh: dev.ActionCh(),
 	}
@@ -59,7 +59,7 @@ func NewGame() *Game {
 }
 
 func (g *Game) Update() error {
-	if err := g.Map.Update(); err != nil {
+	if err := g.Field.Update(); err != nil {
 		return err
 	}
 	select {
@@ -68,19 +68,19 @@ func (g *Game) Update() error {
 	case in := <-g.ActionCh:
 		switch in {
 		case base.ActUp:
-			if g.Map.IsMovable(base.NewVertex(g.Me.Loc.X, g.Me.Loc.Y-1)) {
+			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X, g.Me.Loc.Y-1)) {
 				g.Me.Loc.Y -= 1
 			}
 		case base.ActDown:
-			if g.Map.IsMovable(base.NewVertex(g.Me.Loc.X, g.Me.Loc.Y+1)) {
+			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X, g.Me.Loc.Y+1)) {
 				g.Me.Loc.Y += 1
 			}
 		case base.ActLeft:
-			if g.Map.IsMovable(base.NewVertex(g.Me.Loc.X-1, g.Me.Loc.Y)) {
+			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X-1, g.Me.Loc.Y)) {
 				g.Me.Loc.X -= 1
 			}
 		case base.ActRight:
-			if g.Map.IsMovable(base.NewVertex(g.Me.Loc.X+1, g.Me.Loc.Y)) {
+			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X+1, g.Me.Loc.Y)) {
 				g.Me.Loc.X += 1
 			}
 		}
@@ -96,8 +96,8 @@ var (
 func (g *Game) Draw(screen *ebiten.Image) {
 	start := time.Now()
 
-	g.MapCam.DrawMap(screen, g.Map, g.MapCam.CalcTopLeft(g.Me.Loc))
-	g.MapCam.DrawObject(screen, g.Me, g.MapCam.CalcTopLeft(g.Me.Loc))
+	g.FieldCam.DrawField(screen, g.Field, g.FieldCam.CalcTopLeft(g.Me.Loc))
+	g.FieldCam.DrawObject(screen, g.Me, g.FieldCam.CalcTopLeft(g.Me.Loc))
 
 	drawTime = drawTime / 60 * 59
 	drawTime += time.Since(start).Nanoseconds() / 60
@@ -111,5 +111,5 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return g.MapCam.ScreenResolution.X, g.MapCam.ScreenResolution.Y
+	return g.FieldCam.ScreenResolution.X, g.FieldCam.ScreenResolution.Y
 }

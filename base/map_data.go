@@ -1,19 +1,14 @@
 package base
 
 const (
-	MapUndef MapName = iota
-	Map01
-)
-
-const (
-	LayerUndef LayerName = iota
-	Layer01A
-	Layer01B
+	Map01          = "Map01"
+	Layer01Base    = "Layer01Base"
+	Layer01Objects = "Layer01Objects"
 )
 
 var Map01Dim = Vertex{26, 14}
 
-const Layer01AData = `
+const Layer01BaseStr = `
 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4
 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4
@@ -30,7 +25,7 @@ const Layer01AData = `
 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
 `
 
-const Layer01BData = `
+const Layer01ObjectsStr = `
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1

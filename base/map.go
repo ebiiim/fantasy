@@ -1,17 +1,15 @@
 package base
 
-type MapName int
+type MapName string
 
 type Map struct {
-	Name        MapName
-	Size        Vertex
-	Layers      []*Layer
-	landMovable []bool
+	Name      MapName
+	Dimension Vertex
+	Layers    []*Layer
 }
 
 func NewMap(name MapName, size Vertex, layers []*Layer) *Map {
-	m := Map{Name: name, Size: size, Layers: layers}
-	m.landMovable = make([]bool, m.Size.X*m.Size.Y)
+	m := Map{Name: name, Dimension: size, Layers: layers}
 	return &m
 }
 
@@ -21,28 +19,4 @@ func (m *Map) GetObjects(loc Vertex) []*Object {
 		objs[idx] = layer.GetObject(loc)
 	}
 	return objs
-}
-
-func (m *Map) Update() error {
-	m.updateLandMovable()
-	return nil
-}
-
-func (m *Map) updateLandMovable() {
-	for idx := range m.landMovable {
-		objs := m.GetObjects(VertexFromIndex(m.Size, idx))
-		movable := FNone
-		for _, obj := range objs {
-			movable |= obj.FlagSet
-		}
-		m.landMovable[idx] = (movable & FLandObject) != FLandObject
-	}
-}
-
-func (m *Map) IsMovable(loc Vertex) bool {
-	if loc.IsOutside(m.Size) {
-		return false
-	}
-	idx := loc.ToIndex(m.Size)
-	return m.landMovable[idx]
 }
