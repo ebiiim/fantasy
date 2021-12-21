@@ -20,9 +20,9 @@ const (
 	FLandObject         = fBlockLand | fBlockSea
 	FSeaObject          = fBlockLand | fBlockSea
 	FSkyObject          = fBlockSky
-	FMe                 = fMe | fPlayer | fCharacter | FLandObject
+	FMe                 = fMe | fPlayer | fCharacter
+	FPlayer             = fPlayer | fCharacter | fActionObj
 	FNPC                = fNPC | fCharacter | fActionObj | FLandObject
-	FPlayer             = fPlayer | fCharacter | fActionObj | FLandObject
 	FBox                = fActionObj | FLandObject
 )
 
