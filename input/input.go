@@ -75,16 +75,16 @@ func (k *Keyboard) ListenLoop(ctx context.Context) {
 		case <-time.After(1000 / 60 * time.Millisecond): // every frame
 			switch {
 			case ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyArrowUp):
-				k.actCh <- base.ACT_UP
+				k.actCh <- base.ActUp
 				<-time.After(1000 / 6 * time.Millisecond)
 			case ebiten.IsKeyPressed(ebiten.KeyA) || ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
-				k.actCh <- base.ACT_LEFT
+				k.actCh <- base.ActLeft
 				<-time.After(1000 / 6 * time.Millisecond)
 			case ebiten.IsKeyPressed(ebiten.KeyS) || ebiten.IsKeyPressed(ebiten.KeyArrowDown):
-				k.actCh <- base.ACT_DOWN
+				k.actCh <- base.ActDown
 				<-time.After(1000 / 6 * time.Millisecond)
 			case ebiten.IsKeyPressed(ebiten.KeyD) || ebiten.IsKeyPressed(ebiten.KeyArrowRight):
-				k.actCh <- base.ACT_RIGHT
+				k.actCh <- base.ActRight
 				<-time.After(1000 / 6 * time.Millisecond)
 			}
 		}
@@ -136,15 +136,15 @@ func (m *Mouse) ListenLoop(ctx context.Context) {
 				}
 				if abs(lr) < abs(ud) {
 					if ud < 0 {
-						m.actCh <- base.ACT_UP
+						m.actCh <- base.ActUp
 					} else {
-						m.actCh <- base.ACT_DOWN
+						m.actCh <- base.ActDown
 					}
 				} else {
 					if lr < 0 {
-						m.actCh <- base.ACT_LEFT
+						m.actCh <- base.ActLeft
 					} else {
-						m.actCh <- base.ACT_RIGHT
+						m.actCh <- base.ActRight
 					}
 				}
 				<-time.After(1000 / 6 * time.Millisecond)

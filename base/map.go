@@ -31,11 +31,11 @@ func (m *Map) Update() error {
 func (m *Map) updateLandMovable() {
 	for idx := range m.landMovable {
 		objs := m.GetObjects(VertexFromIndex(m.Size, idx))
-		movable := F_None
+		movable := FNone
 		for _, obj := range objs {
 			movable |= obj.FlagSet
 		}
-		m.landMovable[idx] = (movable & F_LandObject) != F_LandObject
+		m.landMovable[idx] = (movable & FLandObject) != FLandObject
 	}
 }
 

@@ -28,7 +28,7 @@ func NewLayer(name LayerName, size Vertex, objList []ObjectType) *Layer {
 
 func (l *Layer) GetObject(loc Vertex) *Object {
 	if loc.IsOutside(l.Size) {
-		return NewObject(OBJ_Err, loc)
+		return NewObject(ObjUndef, loc)
 	}
 	return l.Objects[loc.ToIndex(l.Size)]
 }
@@ -67,7 +67,7 @@ func LoadLayerFromStr(s string) []ObjectType {
 	for idx, objStr := range objStrList {
 		v, err := strconv.Atoi(objStr)
 		if err != nil {
-			objTypeList[idx] = OBJ_Err
+			objTypeList[idx] = ObjUndef
 		}
 		objTypeList[idx] = ObjectType(v)
 	}

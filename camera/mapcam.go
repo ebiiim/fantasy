@@ -29,7 +29,7 @@ func NewMapCamera(dimTiles, tilePixels base.Vertex) *MapCam {
 	return &c
 }
 
-// CalcLeftTop calcs screen top left tile's location in map.
+// CalcTopLeft calcs screen top left tile's location in map.
 func (c *MapCam) CalcTopLeft(locCenter base.Vertex) base.Vertex {
 	return locCenter.Sub(base.NewVertex(c.DimTiles.X/2-1, c.DimTiles.Y/2-1))
 }
@@ -45,7 +45,7 @@ func (c *MapCam) DrawLayer(screen *ebiten.Image, l *base.Layer, topLeft base.Ver
 		for x := 0; x < c.DimTiles.X; x++ {
 			loc := topLeft.Add(base.NewVertex(x, y))
 			if loc.IsOutside(l.Size) {
-				c.DrawObject(screen, base.NewObject(base.OBJ_BG, loc), topLeft)
+				c.DrawObject(screen, base.NewObject(base.ObjBG, loc), topLeft)
 			} else {
 				c.DrawObject(screen, l.GetObject(loc), topLeft)
 			}
@@ -63,9 +63,9 @@ func (c *MapCam) DrawObject(screen *ebiten.Image, obj *base.Object, locTopLeft b
 	drawY := c.TilePixels.X * pos.Y
 	op.GeoM.Translate(float64(drawX), float64(drawY))
 
-	oi, ok := Object2Image[obj.Type]
+	oi, ok := GetImage[obj.Type]
 	if !ok {
-		oi = Object2Image[base.OBJ_Err]
+		oi = GetImage[base.ObjUndef]
 	}
 
 	screen.DrawImage(oi, op)

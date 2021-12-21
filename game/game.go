@@ -30,10 +30,10 @@ type Game struct {
 func NewGame() *Game {
 
 	l001 := []*base.Layer{
-		base.NewLayer(base.L_001_a, base.M_001_dim, base.LoadLayerFromStr(base.L_001_a_str)),
-		base.NewLayer(base.L_001_b, base.M_001_dim, base.LoadLayerFromStr(base.L_001_b_str)),
+		base.NewLayer(base.Layer01A, base.Map01Dim, base.LoadLayerFromStr(base.Layer01AData)),
+		base.NewLayer(base.Layer01B, base.Map01Dim, base.LoadLayerFromStr(base.Layer01BData)),
 	}
-	m001 := base.NewMap(base.M_001, base.M_001_dim, l001)
+	m001 := base.NewMap(base.Map01, base.Map01Dim, l001)
 
 	kbd := input.NewKeyboard()
 	camCenter := base.NewVertex(7, 5) // HACK: need calc camera center tile
@@ -44,7 +44,7 @@ func NewGame() *Game {
 	g := Game{
 		MapCam:   camera.NewMapCamera(dimCameraTiles, tilePixels),
 		Map:      m001,
-		Me:       base.NewObject(base.OBJ_Me, base.NewVertex(6, 5)),
+		Me:       base.NewObject(base.ObjMe, base.NewVertex(6, 5)),
 		ActionCh: dev.ActionCh(),
 	}
 	return &g
@@ -59,19 +59,19 @@ func (g *Game) Update() error {
 		// no input
 	case in := <-g.ActionCh:
 		switch in {
-		case base.ACT_UP:
+		case base.ActUp:
 			if g.Map.IsMovable(base.NewVertex(g.Me.Loc.X, g.Me.Loc.Y-1)) {
 				g.Me.Loc.Y -= 1
 			}
-		case base.ACT_DOWN:
+		case base.ActDown:
 			if g.Map.IsMovable(base.NewVertex(g.Me.Loc.X, g.Me.Loc.Y+1)) {
 				g.Me.Loc.Y += 1
 			}
-		case base.ACT_LEFT:
+		case base.ActLeft:
 			if g.Map.IsMovable(base.NewVertex(g.Me.Loc.X-1, g.Me.Loc.Y)) {
 				g.Me.Loc.X -= 1
 			}
-		case base.ACT_RIGHT:
+		case base.ActRight:
 			if g.Map.IsMovable(base.NewVertex(g.Me.Loc.X+1, g.Me.Loc.Y)) {
 				g.Me.Loc.X += 1
 			}
