@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 
@@ -15,16 +17,24 @@ var (
 )
 
 func init() {
-	// print build info
+	// inject build info
 	setIfEmpty := func(src string, s string) string {
 		if src == "" {
 			return s
 		}
 		return src
 	}
-	println("version " + setIfEmpty(version, "dev"))
-	println("build date " + buildDate)
-	println(goVersion)
+	parseDateOrZero := func(s string) time.Time {
+		t, err := time.Parse(time.RFC3339, buildDate)
+		if err != nil {
+			return time.Time{}
+		}
+		return t
+	}
+	game.BuildInfo.Version = setIfEmpty(version, "dev")
+	game.BuildInfo.BuildDate = parseDateOrZero(buildDate)
+	game.BuildInfo.GoVersion = goVersion
+	fmt.Printf("%+v\n", game.BuildInfo)
 }
 
 func main() {

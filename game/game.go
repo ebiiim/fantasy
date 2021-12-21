@@ -14,6 +14,14 @@ import (
 )
 
 var (
+	BuildInfo struct {
+		Version   string
+		BuildDate time.Time
+		GoVersion string
+	}
+)
+
+var (
 	tilePixels     = base.NewVertex(40, 40)
 	dimCameraTiles = base.NewVertex(16, 12)
 )
@@ -94,7 +102,12 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	drawTime = drawTime / 60 * 59
 	drawTime += time.Since(start).Nanoseconds() / 60
 	stats := fmt.Sprintf("TPS: %0.2f\nFPS: %0.2f\nDraw: %d us\n%s", ebiten.CurrentTPS(), ebiten.CurrentFPS(), drawTime/1000, guide)
+
+	// debug prints
 	ebitenutil.DebugPrint(screen, stats)
+	x, y := g.Layout(0, 0)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Version: %s", BuildInfo.Version), x/100*74, y-30)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Build date: %s", BuildInfo.BuildDate.Format("Jan 02 2006 15:04:05")), x/100*74, y-15)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
