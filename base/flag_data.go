@@ -9,7 +9,8 @@ func initData() {
 	m[ObjMeadow] = TerrainLand | TerrainSky
 	m[ObjGrass] = None
 	m[ObjTree] = BlockLand
-	m[ObjBox] = ItemBox
+	m[ObjBox] = FlagItemBox
 	m[ObjWater] = TerrainSea | TerrainSky
-	m[ObjMe] = Me
+	m[ObjSheep] = FlagNPC
+	m[ObjMe] = FlagMe
 }

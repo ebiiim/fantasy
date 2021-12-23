@@ -11,5 +11,6 @@ const (
 	ObjTree                     // 5
 	ObjBox                      // 6
 	ObjWater                    // 7
-	ObjMe                       // 8
+	ObjSheep                    // 8
+	ObjMe                       // 9
 )

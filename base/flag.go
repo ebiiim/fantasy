@@ -42,10 +42,10 @@ const (
 	BlockSea  = IsBlockingObject | IsInSea
 	BlockSky  = IsBlockingObject | IsInSky
 
-	Me      = IsCharacter | IsPlayer | IsMe | CanOnLand
-	Player  = IsCharacter | IsPlayer | HasAction | CanOnLand
-	NPC     = IsCharacter | IsNPC | HasAction | IsBlockingObject | CanOnLand
-	ItemBox = HasAction | IsBlockingObject
+	FlagMe      = IsCharacter | IsPlayer | IsMe | CanOnLand
+	FlagPlayer  = IsCharacter | IsPlayer | HasAction | CanOnLand
+	FlagNPC     = IsCharacter | IsNPC | HasAction | IsBlockingObject | CanOnLand
+	FlagItemBox = HasAction | IsBlockingObject
 )
 
 var m map[ObjectType]Flag

@@ -25,12 +25,16 @@
 
 - name: ObjBox
   img: box.png
-  flags: [ItemBox]
+  flags: [FlagItemBox]
 
 - name: ObjWater
   img: water.png
   flags: [TerrainSea, TerrainSky]
 
+- name: ObjSheep
+  img: sheep.png
+  flags: [FlagNPC]
+
 - name: ObjMe
   img: me.png
-  flags: [Me]
+  flags: [FlagMe]
