@@ -42,11 +42,13 @@ func NewGame() *Game {
 	f := base.NewField(m)
 
 	me := base.NewMe(base.NewObject(base.ObjMe, base.NewVertex(6, 5)))
-	sheep1 := base.NewSheep(base.NewObject(base.ObjSheep, base.NewVertex(8, 5)))
-	sheep2 := base.NewSheep(base.NewObject(base.ObjSheep, base.NewVertex(9, 10)))
+	sheep1 := base.NewSheep(base.NewObject(base.ObjSheep, base.NewVertex(4, 5)))
+	sheep2 := base.NewSheep(base.NewObject(base.ObjSheep, base.NewVertex(10, 8)))
+	sheep3 := base.NewSheep(base.NewObject(base.ObjSheep, base.NewVertex(15, 4)))
 	f.AddIntelligent(me)
 	f.AddIntelligent(sheep1)
 	f.AddIntelligent(sheep2)
+	f.AddIntelligent(sheep3)
 
 	fcam := camera.NewFieldCam(dimCameraTiles, tilePixels)
 	kbd := input.NewKeyboard()

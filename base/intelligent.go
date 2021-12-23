@@ -106,10 +106,11 @@ func (s *Sheep) SendCh() chan<- Action {
 func (s *Sheep) Born(f *Field) {
 	s.field = f
 	for {
+
 		select {
 		case <-s.done:
 			return
-		case <-time.After(time.Second):
+		case <-time.After(time.Millisecond * time.Duration(500+rand.Intn(2000))):
 			// log.Println("Sheep try to move")
 			axis := rand.Intn(10)     // X:Y=7:3
 			value := rand.Intn(3) - 1 // -1,0,1
