@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.3 - 2021-12-24
+
+Baa Baa.
+
+### Added
+
+- moving sheep
+
 ## 0.0.2 - 2021-12-22
 
 Code improvements.
