@@ -10,7 +10,6 @@ import (
 	"github.com/ebiiim/fantasy/base"
 )
 
-
 //go:embed assets/*
 var assets embed.FS
 
@@ -21,6 +20,8 @@ func init() {
 	initData()
 }
 
+// Get returns the image for the giving Object.
+// Returns ObjUndef if no image is found for `obj`.
 func Get(obj base.Object) *ebiten.Image {
 	v, ok := m[obj]
 	if !ok {
@@ -29,6 +30,7 @@ func Get(obj base.Object) *ebiten.Image {
 	return v
 }
 
+// load loads images and panics if it fails.
 func load(file string) *ebiten.Image {
 	f, err := assets.Open(file)
 	if err != nil {

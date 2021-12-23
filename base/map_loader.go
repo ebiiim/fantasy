@@ -8,6 +8,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// mapData represents the internal data structure for map YAML files.
 type mapData struct {
 	Name        string `yaml:"name"`
 	Description string `yaml:"description"`
@@ -25,6 +26,7 @@ type mapData struct {
 //go:embed assets/*
 var assets embed.FS
 
+// MustLoadMap loads a Map from the given YAML file and panics if it fails.
 func MustLoadMap(file string) *Map {
 	f, err := assets.Open(file)
 	if err != nil {
@@ -42,6 +44,9 @@ func MustLoadMap(file string) *Map {
 	return NewMap(MapName(md.Name), dim, ls)
 }
 
+// loadLayerFromStr loads Objects from a string.
+// E.g., "1 1 1" -> [ObjectNone, ObjectNone, ObjectNone]
+// Cf. object_data.go
 func loadLayerFromStr(s string) []Object {
 	ss := strings.ReplaceAll(s, "\n", " ")
 	ss = strings.Trim(ss, " ")

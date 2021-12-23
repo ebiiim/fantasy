@@ -5,7 +5,8 @@ import "github.com/ebiiim/fantasy/base"
 type Flag uint
 
 const (
-	BlockLand Flag = 1 << iota
+	Undef Flag = 1 << iota
+	BlockLand
 	BlockSea
 	BlockSky
 	IsHigh
@@ -39,10 +40,12 @@ func init() {
 	initData()
 }
 
+// Get returns the flag for the giving Object.
+// Returns Undef if no flag is found for `obj`.
 func Get(obj base.Object) Flag {
 	v, ok := m[obj]
 	if !ok {
-		return m[base.ObjUndef]
+		return Undef
 	}
 	return v
 }

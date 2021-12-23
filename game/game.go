@@ -15,6 +15,7 @@ import (
 )
 
 var (
+	// values decided at compile time and injected by main function
 	BuildInfo struct {
 		Version   string
 		BuildDate time.Time
@@ -44,7 +45,7 @@ func NewGame() *Game {
 
 	fcam := camera.NewFieldCam(dimCameraTiles, tilePixels)
 	kbd := input.NewKeyboard()
-	mouse := input.NewMouse(fcam.CameraCenterTile(), tilePixels)
+	mouse := input.NewMouse(fcam.PositionCenter(), tilePixels)
 	dev := input.NewJoinedDevice(kbd, mouse)
 	go dev.ListenLoop(context.Background())
 
@@ -59,9 +60,12 @@ func NewGame() *Game {
 }
 
 func (g *Game) Update() error {
+	// update the field
 	if err := g.Field.Update(); err != nil {
 		return err
 	}
+
+	// check inputs and do actions
 	select {
 	default:
 		// no input
@@ -96,20 +100,25 @@ var (
 func (g *Game) Draw(screen *ebiten.Image) {
 	start := time.Now()
 
-	g.FieldCam.DrawField(screen, g.Field, g.FieldCam.CalcTopLeft(g.MyLoc))
-	g.FieldCam.DrawObject(screen, g.Me, g.FieldCam.CameraCenterTile())
+	g.FieldCam.DrawField(screen, g.Field, g.FieldCam.PositionTopLeft(g.MyLoc))
+	g.FieldCam.DrawObject(screen, g.Me, g.FieldCam.PositionCenter())
 
+	g.drawDebugPrints(screen, start)
+}
+
+func (g *Game) drawDebugPrints(screen *ebiten.Image, started time.Time) {
 	drawTime = drawTime / 60 * 59
-	drawTime += time.Since(start).Nanoseconds() / 60
+	drawTime += time.Since(started).Nanoseconds() / 60
 	stats := fmt.Sprintf("TPS: %0.2f\nFPS: %0.2f\nDraw: %d us\n%s", ebiten.CurrentTPS(), ebiten.CurrentFPS(), drawTime/1000, guide)
-
-	// debug prints
 	ebitenutil.DebugPrint(screen, stats)
 	x, y := g.Layout(0, 0)
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Version: %s", BuildInfo.Version), x/100*75, y-30)
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Build date: %s", BuildInfo.BuildDate.Format(time.RFC822)), x/100*75, y-15)
+
 }
 
-func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
+// Layout returns the screen resolution that is needed to draw the grid.
+// Always returns same value for now.
+func (g *Game) Layout(_, _ int) (int, int) {
 	return g.FieldCam.ScreenResolution.X, g.FieldCam.ScreenResolution.Y
 }

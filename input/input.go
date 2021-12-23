@@ -9,13 +9,18 @@ import (
 	"github.com/ebiiim/fantasy/base"
 )
 
+// Device represents any input device.
 type Device interface {
+	// ActionCh returns the channel for sending captured actions.
 	ActionCh() <-chan base.Action
+	// ListenLoop starts the listening loop.
+	// This is blocking so consider using goroutine.
 	ListenLoop(ctx context.Context)
 }
 
 var _ Device = (*JoinedDevice)(nil)
 
+// JoinedDevice represents a virtual device that merges multiple input devices.
 type JoinedDevice struct {
 	actCh chan base.Action
 	devs  []Device
@@ -94,9 +99,9 @@ func (k *Keyboard) ListenLoop(ctx context.Context) {
 var _ Device = (*Mouse)(nil)
 
 type Mouse struct {
-	centerTile base.Vertex
-	tilePixels base.Vertex
-	actCh      chan base.Action
+	positionGridCenter base.Vertex
+	sizeTilePixel      base.Vertex
+	actCh              chan base.Action
 }
 
 func NewMouse(centerTile, tilePixels base.Vertex) *Mouse {
@@ -128,9 +133,9 @@ func (m *Mouse) ListenLoop(ctx context.Context) {
 			switch {
 			case ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft):
 				x, y := ebiten.CursorPosition()
-				clicked := base.NewVertex(x, y).Div(m.tilePixels)
-				lr := clicked.X - m.centerTile.X
-				ud := clicked.Y - m.centerTile.Y
+				clicked := base.NewVertex(x, y).Div(m.sizeTilePixel)
+				lr := clicked.X - m.positionGridCenter.X
+				ud := clicked.Y - m.positionGridCenter.Y
 				if abs(lr) == abs(ud) {
 					continue
 				}

@@ -8,36 +8,39 @@ import (
 	"github.com/ebiiim/fantasy/img"
 )
 
+// FieldCam represents the field renderer.
 type FieldCam struct {
-	// DimTiles represents tiles to draw.
-	// e.g., {16,12}
-	DimTiles base.Vertex
+	// DimGrid represents dimension of the grid.
+	// E.g., {16,12}
+	DimGrid base.Vertex
 
 	// TilePixels represents tile size.
-	// e.g., {40,40}
+	// E.g., {40,40}
 	TilePixels base.Vertex
 
-	// ScreenResolution represents screen size needed to draw tiles.
-	// e.g., {640,480} <- {16*40,12*40}
+	// ScreenResolution represents the screen size that is needed to draw the whole grid.
+	// E.g., {640,480} <- {16*40,12*40}
 	ScreenResolution base.Vertex
 }
 
+// NewFieldCam initializes FieldCam.
 func NewFieldCam(dimTiles, tilePixels base.Vertex) *FieldCam {
 	c := FieldCam{
-		DimTiles:         dimTiles,
+		DimGrid:          dimTiles,
 		TilePixels:       tilePixels,
 		ScreenResolution: dimTiles.Mul(tilePixels),
 	}
 	return &c
 }
 
-func (c *FieldCam) CameraCenterTile() base.Vertex {
-	return base.NewVertex(c.DimTiles.X/2-1, c.DimTiles.Y/2-1)
+// PositionCenter returns the center position of the grid.
+func (c *FieldCam) PositionCenter() base.Vertex {
+	return base.NewVertex(c.DimGrid.X/2-1, c.DimGrid.Y/2-1)
 }
 
-// CalcTopLeft calcs screen top left tile's location in map.
-func (c *FieldCam) CalcTopLeft(locCenter base.Vertex) base.Vertex {
-	return locCenter.Sub(c.CameraCenterTile())
+// PositionTopLeft returns the top left position of the grid.
+func (c *FieldCam) PositionTopLeft(locCenter base.Vertex) base.Vertex {
+	return locCenter.Sub(c.PositionCenter())
 }
 
 func (c *FieldCam) DrawField(screen *ebiten.Image, f *field.Field, topLeft base.Vertex) {
@@ -51,8 +54,8 @@ func (c *FieldCam) DrawMap(screen *ebiten.Image, m *base.Map, topLeft base.Verte
 }
 
 func (c *FieldCam) DrawLayer(screen *ebiten.Image, l *base.Layer, topLeft base.Vertex) {
-	for y := 0; y < c.DimTiles.Y; y++ {
-		for x := 0; x < c.DimTiles.X; x++ {
+	for y := 0; y < c.DimGrid.Y; y++ {
+		for x := 0; x < c.DimGrid.X; x++ {
 			pos := base.NewVertex(x, y)
 			loc := topLeft.Add(pos)
 			if loc.IsOutside(l.Dimension) {
@@ -65,7 +68,7 @@ func (c *FieldCam) DrawLayer(screen *ebiten.Image, l *base.Layer, topLeft base.V
 }
 
 func (c *FieldCam) DrawObject(screen *ebiten.Image, obj base.Object, pos base.Vertex) {
-	if pos.IsOutside(c.DimTiles) {
+	if pos.IsOutside(c.DimGrid) {
 		return
 	}
 	drawX := c.TilePixels.X * pos.X

@@ -1,8 +1,21 @@
+// generate.go does the preprocessing for build, includes:
+//   1. Making copies of assets.
+//   2. Generating consts for assets from the giving YAML file.
+//
+// Copies:
+//   - ./img/ -> img/assets/
+//   - ./map/ -> base/assets/
+//
+// Generates: (uses the file passed by os.Args[1] as input)
+//   - base/object_data.go
+//   - img/img_data.go
+//   - flag/flag_data.go
+
 //go:generate rm -rf ../img/assets
 //go:generate cp -r img/ ../img/assets/
 //go:generate rm -rf ../base/assets
 //go:generate cp -r map/ ../base/assets/
-//go:generate go run generate.go
+//go:generate go run generate.go data.yaml
 //go:generate go fmt ../base/object_data.go
 
 package main
@@ -67,7 +80,7 @@ func mergeFlags(d []*ObjectData) {
 }
 
 func main() {
-	src := "data.yaml"
+	src := os.Args[1]
 
 	objTmpl := "object_data.go.tmpl"
 	objDst := "../base/object_data.go"
