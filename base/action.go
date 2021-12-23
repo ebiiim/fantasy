@@ -1,14 +1,19 @@
 package base
 
-type Action uint
+type ActionType uint
 
 const (
-	ActUndefined Action = iota
-	ActUp
-	ActLeft
-	ActDown
-	ActRight
-	ActA
-	ActB
-	ActStart
+	ActUndefined ActionType = iota
+	ActMove
+	ActMoved
 )
+
+type Action struct {
+	Type ActionType
+
+	// Send to Field
+	MoveLoc Vertex
+
+	// Receive from Field
+	MovedLoc Vertex
+}

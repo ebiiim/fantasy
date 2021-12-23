@@ -4,7 +4,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 
 	"github.com/ebiiim/fantasy/base"
-	"github.com/ebiiim/fantasy/field"
 )
 
 // FieldCam represents the field renderer.
@@ -42,7 +41,7 @@ func (c *FieldCam) PositionTopLeft(locCenter base.Vertex) base.Vertex {
 	return locCenter.Sub(c.PositionCenter())
 }
 
-func (c *FieldCam) DrawField(screen *ebiten.Image, f *field.Field, topLeft base.Vertex) {
+func (c *FieldCam) DrawField(screen *ebiten.Image, f *base.Field, topLeft base.Vertex) {
 	c.DrawMap(screen, f.Map, topLeft)
 }
 

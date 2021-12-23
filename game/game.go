@@ -10,7 +10,6 @@ import (
 
 	"github.com/ebiiim/fantasy/base"
 	"github.com/ebiiim/fantasy/camera"
-	"github.com/ebiiim/fantasy/field"
 	"github.com/ebiiim/fantasy/input"
 )
 
@@ -31,16 +30,23 @@ var (
 var _ ebiten.Game = (*Game)(nil)
 
 type Game struct {
-	Field    *field.Field
+	Field    *base.Field
 	FieldCam *camera.FieldCam
-	Me       *base.Object
-	ActionCh <-chan base.Action
+	Me       *base.Me
+	ButtonCh <-chan input.Button
 }
 
 func NewGame() *Game {
 
 	m := base.MustLoadMap("assets/map01.yaml")
-	f := field.NewField(m)
+	f := base.NewField(m)
+
+	me := base.NewMe(base.NewObject(base.ObjMe, base.NewVertex(6, 5)))
+	sheep1 := base.NewSheep(base.NewObject(base.ObjSheep, base.NewVertex(8, 5)))
+	sheep2 := base.NewSheep(base.NewObject(base.ObjSheep, base.NewVertex(9, 10)))
+	f.AddIntelligent(me)
+	f.AddIntelligent(sheep1)
+	f.AddIntelligent(sheep2)
 
 	fcam := camera.NewFieldCam(dimCameraTiles, tilePixels)
 	kbd := input.NewKeyboard()
@@ -51,8 +57,8 @@ func NewGame() *Game {
 	g := Game{
 		Field:    f,
 		FieldCam: fcam,
-		Me:       base.NewObject(base.ObjMe, base.NewVertex(6, 5)),
-		ActionCh: dev.ActionCh(),
+		Me:       me,
+		ButtonCh: dev.ButtonCh(),
 	}
 	return &g
 }
@@ -67,24 +73,23 @@ func (g *Game) Update() error {
 	select {
 	default:
 		// no input
-	case in := <-g.ActionCh:
-		switch in {
-		case base.ActUp:
-			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X, g.Me.Loc.Y-1)) {
-				g.Me.Loc.Y -= 1
-			}
-		case base.ActDown:
-			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X, g.Me.Loc.Y+1)) {
-				g.Me.Loc.Y += 1
-			}
-		case base.ActLeft:
-			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X-1, g.Me.Loc.Y)) {
-				g.Me.Loc.X -= 1
-			}
-		case base.ActRight:
-			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X+1, g.Me.Loc.Y)) {
-				g.Me.Loc.X += 1
-			}
+	case btn := <-g.ButtonCh:
+		movedLoc := base.NewVertex(-1, -1)
+		switch btn {
+		case input.BtnUp:
+			movedLoc = base.NewVertex(g.Me.Obj().Loc.X, g.Me.Obj().Loc.Y-1)
+		case input.BtnDown:
+			movedLoc = base.NewVertex(g.Me.Obj().Loc.X, g.Me.Obj().Loc.Y+1)
+		case input.BtnLeft:
+			movedLoc = base.NewVertex(g.Me.Obj().Loc.X-1, g.Me.Obj().Loc.Y)
+		case input.BtnRight:
+			movedLoc = base.NewVertex(g.Me.Obj().Loc.X+1, g.Me.Obj().Loc.Y)
+		}
+		if movedLoc.X != -1 {
+			g.Me.SendMe(base.Action{
+				Type:    base.ActMove,
+				MoveLoc: movedLoc,
+			})
 		}
 	}
 	return nil
@@ -98,8 +103,11 @@ var (
 func (g *Game) Draw(screen *ebiten.Image) {
 	start := time.Now()
 
-	g.FieldCam.DrawField(screen, g.Field, g.FieldCam.PositionTopLeft(g.Me.Loc))
-	g.FieldCam.DrawObject(screen, g.Me, g.FieldCam.PositionCenter())
+	g.FieldCam.DrawField(screen, g.Field, g.FieldCam.PositionTopLeft(g.Me.Obj().Loc))
+
+	for _, intelli := range g.Field.Intelligents {
+		g.FieldCam.DrawObject(screen, intelli.Obj(), intelli.Obj().Loc.Sub(g.FieldCam.PositionTopLeft(g.Me.Obj().Loc)))
+	}
 
 	g.drawDebugPrints(screen, start)
 }

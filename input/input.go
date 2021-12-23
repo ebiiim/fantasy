@@ -9,10 +9,23 @@ import (
 	"github.com/ebiiim/fantasy/base"
 )
 
+type Button uint
+
+const (
+	BtnUndef Button = iota
+	BtnUp
+	BtnLeft
+	BtnDown
+	BtnRight
+	BtnA
+	BtnB
+	BtnStart
+)
+
 // Device represents any input device.
 type Device interface {
-	// ActionCh returns the channel for sending captured actions.
-	ActionCh() <-chan base.Action
+	// ButtonCh returns the channel for sending captured buttons.
+	ButtonCh() <-chan Button
 	// ListenLoop starts the listening loop.
 	// This is blocking so consider using goroutine.
 	ListenLoop(ctx context.Context)
@@ -22,19 +35,19 @@ var _ Device = (*JoinedDevice)(nil)
 
 // JoinedDevice represents a virtual device that merges multiple input devices.
 type JoinedDevice struct {
-	actCh chan base.Action
+	btnCh chan Button
 	devs  []Device
 }
 
 func NewJoinedDevice(devs ...Device) *JoinedDevice {
 	var c JoinedDevice
-	c.actCh = make(chan base.Action)
+	c.btnCh = make(chan Button)
 	c.devs = devs
 	return &c
 }
 
-func (c *JoinedDevice) ActionCh() <-chan base.Action {
-	return c.actCh
+func (c *JoinedDevice) ButtonCh() <-chan Button {
+	return c.btnCh
 }
 
 func (c *JoinedDevice) ListenLoop(ctx context.Context) {
@@ -42,13 +55,13 @@ func (c *JoinedDevice) ListenLoop(ctx context.Context) {
 		dev := dev
 		go func() {
 			go dev.ListenLoop(ctx)
-			ch := dev.ActionCh()
+			ch := dev.ButtonCh()
 			for {
 				select {
 				case <-ctx.Done():
 					return
 				case act := <-ch:
-					c.actCh <- act
+					c.btnCh <- act
 				}
 			}
 		}()
@@ -59,17 +72,17 @@ func (c *JoinedDevice) ListenLoop(ctx context.Context) {
 var _ Device = (*Keyboard)(nil)
 
 type Keyboard struct {
-	actCh chan base.Action
+	btnCh chan Button
 }
 
 func NewKeyboard() *Keyboard {
 	var k Keyboard
-	k.actCh = make(chan base.Action)
+	k.btnCh = make(chan Button)
 	return &k
 }
 
-func (k *Keyboard) ActionCh() <-chan base.Action {
-	return k.actCh
+func (k *Keyboard) ButtonCh() <-chan Button {
+	return k.btnCh
 }
 
 func (k *Keyboard) ListenLoop(ctx context.Context) {
@@ -80,16 +93,16 @@ func (k *Keyboard) ListenLoop(ctx context.Context) {
 		case <-time.After(1000 / 60 * time.Millisecond): // every frame
 			switch {
 			case ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyArrowUp):
-				k.actCh <- base.ActUp
+				k.btnCh <- BtnUp
 				<-time.After(1000 / 6 * time.Millisecond)
 			case ebiten.IsKeyPressed(ebiten.KeyA) || ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
-				k.actCh <- base.ActLeft
+				k.btnCh <- BtnLeft
 				<-time.After(1000 / 6 * time.Millisecond)
 			case ebiten.IsKeyPressed(ebiten.KeyS) || ebiten.IsKeyPressed(ebiten.KeyArrowDown):
-				k.actCh <- base.ActDown
+				k.btnCh <- BtnDown
 				<-time.After(1000 / 6 * time.Millisecond)
 			case ebiten.IsKeyPressed(ebiten.KeyD) || ebiten.IsKeyPressed(ebiten.KeyArrowRight):
-				k.actCh <- base.ActRight
+				k.btnCh <- BtnRight
 				<-time.After(1000 / 6 * time.Millisecond)
 			}
 		}
@@ -101,20 +114,20 @@ var _ Device = (*Mouse)(nil)
 type Mouse struct {
 	positionGridCenter base.Vertex
 	sizeTilePixel      base.Vertex
-	actCh              chan base.Action
+	btnCh              chan Button
 }
 
 func NewMouse(centerTile, tilePixels base.Vertex) *Mouse {
 	m := Mouse{
 		centerTile,
 		tilePixels,
-		make(chan base.Action),
+		make(chan Button),
 	}
 	return &m
 }
 
-func (m *Mouse) ActionCh() <-chan base.Action {
-	return m.actCh
+func (m *Mouse) ButtonCh() <-chan Button {
+	return m.btnCh
 }
 
 func abs(n int) int {
@@ -141,15 +154,15 @@ func (m *Mouse) ListenLoop(ctx context.Context) {
 				}
 				if abs(lr) < abs(ud) {
 					if ud < 0 {
-						m.actCh <- base.ActUp
+						m.btnCh <- BtnUp
 					} else {
-						m.actCh <- base.ActDown
+						m.btnCh <- BtnDown
 					}
 				} else {
 					if lr < 0 {
-						m.actCh <- base.ActLeft
+						m.btnCh <- BtnLeft
 					} else {
-						m.actCh <- base.ActRight
+						m.btnCh <- BtnRight
 					}
 				}
 				<-time.After(1000 / 6 * time.Millisecond)
