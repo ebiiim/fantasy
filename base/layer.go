@@ -5,10 +5,10 @@ type LayerName string
 type Layer struct {
 	Name      LayerName
 	Dimension Vertex
-	Objects   []Object
+	Objects   []*Object
 }
 
-func NewLayer(name LayerName, size Vertex, objList []Object) *Layer {
+func NewLayer(name LayerName, size Vertex, objList []*Object) *Layer {
 	l := Layer{
 		Name:      name,
 		Dimension: size,
@@ -17,9 +17,16 @@ func NewLayer(name LayerName, size Vertex, objList []Object) *Layer {
 	return &l
 }
 
-func (l *Layer) GetObject(loc Vertex) Object {
+func (l *Layer) GetObject(loc Vertex) *Object {
 	if loc.IsOutside(l.Dimension) {
-		return ObjUndef
+		return NewObject(ObjUndef, loc)
 	}
 	return l.Objects[loc.ToIndex(l.Dimension)]
+}
+
+func (l *Layer) GetObjectOrErr(loc Vertex) (*Object, error) {
+	if loc.IsOutside(l.Dimension) {
+		return nil, ErrNoObjectFound
+	}
+	return l.Objects[loc.ToIndex(l.Dimension)], nil
 }

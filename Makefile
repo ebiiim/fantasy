@@ -22,4 +22,4 @@ build-native:
 
 ./dist/wasm/wasm_exec.js:
 	mkdir -p ./dist/wasm
-	curl -L -o ./dist/wasm/wasm_exec.js https://raw.githubusercontent.com/golang/go/$(shell go version | { read _ _ v _; echo $${v#go}; })/misc/wasm/wasm_exec.js
+	curl -L -o ./dist/wasm/wasm_exec.js https://raw.githubusercontent.com/golang/go/go$(shell go version | { read _ _ v _; echo $${v#go}; })/misc/wasm/wasm_exec.js

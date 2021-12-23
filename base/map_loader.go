@@ -39,25 +39,25 @@ func MustLoadMap(file string) *Map {
 	dim := NewVertex(md.Dimension.X, md.Dimension.Y)
 	ls := make([]*Layer, len(md.Layers))
 	for idx, v := range md.Layers {
-		ls[idx] = NewLayer(LayerName(v.Name), dim, loadLayerFromStr(v.Objects))
+		ls[idx] = NewLayer(LayerName(v.Name), dim, loadLayerFromStr(dim, v.Objects))
 	}
+
 	return NewMap(MapName(md.Name), dim, ls)
 }
 
 // loadLayerFromStr loads Objects from a string.
-// E.g., "1 1 1" -> [ObjectNone, ObjectNone, ObjectNone]
 // Cf. object_data.go
-func loadLayerFromStr(s string) []Object {
+func loadLayerFromStr(dim Vertex, s string) []*Object {
 	ss := strings.ReplaceAll(s, "\n", " ")
 	ss = strings.Trim(ss, " ")
 	objStrList := strings.Split(ss, " ")
-	objTypeList := make([]Object, len(objStrList))
+	objList := make([]*Object, len(objStrList))
 	for idx, objStr := range objStrList {
 		v, err := strconv.Atoi(objStr)
 		if err != nil {
-			objTypeList[idx] = ObjUndef
+			objList[idx] = NewObject(ObjUndef, VertexFromIndex(dim, idx))
 		}
-		objTypeList[idx] = Object(v)
+		objList[idx] = NewObject(ObjectType(v), VertexFromIndex(dim, idx))
 	}
-	return objTypeList
+	return objList
 }

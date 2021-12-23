@@ -3,16 +3,16 @@
 //   2. Generating consts for assets from the giving YAML file.
 //
 // Copies:
-//   - ./img/ -> img/assets/
+//   - ./img/ -> camera/assets/
 //   - ./map/ -> base/assets/
 //
 // Generates: (uses the file passed by os.Args[1] as input)
 //   - base/object_data.go
-//   - img/img_data.go
-//   - flag/flag_data.go
+//   - camera/img_data.go
+//   - base/flag_data.go
 
-//go:generate rm -rf ../img/assets
-//go:generate cp -r img/ ../img/assets/
+//go:generate rm -rf ../camera/assets
+//go:generate cp -r img/ ../camera/assets/
 //go:generate rm -rf ../base/assets
 //go:generate cp -r map/ ../base/assets/
 //go:generate go run generate.go data.yaml
@@ -86,10 +86,10 @@ func main() {
 	objDst := "../base/object_data.go"
 
 	imgTmpl := "img_data.go.tmpl"
-	imgDst := "../img/img_data.go"
+	imgDst := "../camera/img_data.go"
 
 	flagTmpl := "flag_data.go.tmpl"
-	flagDst := "../flag/flag_data.go"
+	flagDst := "../base/flag_data.go"
 
 	f, err := os.Open(src)
 	if err != nil {

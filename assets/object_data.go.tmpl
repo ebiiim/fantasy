@@ -4,6 +4,6 @@ package base
 
 const (
 	{{- range $idx, $elem := . }}
-	{{ $elem.Name }}{{if eq $idx 0 }} Object = iota{{end}} // {{ $idx }}
+	{{ $elem.Name }}{{if eq $idx 0 }} ObjectType = iota{{end}} // {{ $idx }}
 	{{- end }}
 )

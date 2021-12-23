@@ -13,10 +13,22 @@ func NewMap(name MapName, size Vertex, layers []*Layer) *Map {
 	return &m
 }
 
-func (m *Map) GetObjects(loc Vertex) []Object {
-	objs := make([]Object, len(m.Layers))
+func (m *Map) GetObjects(loc Vertex) []*Object {
+	objs := make([]*Object, len(m.Layers))
 	for idx, layer := range m.Layers {
 		objs[idx] = layer.GetObject(loc)
 	}
 	return objs
+}
+
+func (m *Map) GetObjectsOrErr(loc Vertex) ([]*Object, error) {
+	objs := make([]*Object, len(m.Layers))
+	for idx, layer := range m.Layers {
+		obj, err := layer.GetObjectOrErr(loc)
+		if err != nil {
+			return nil, ErrNoObjectFound
+		}
+		objs[idx] = obj
+	}
+	return objs, nil
 }

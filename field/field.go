@@ -2,7 +2,6 @@ package field
 
 import (
 	"github.com/ebiiim/fantasy/base"
-	"github.com/ebiiim/fantasy/flag"
 )
 
 type Field struct {
@@ -24,11 +23,11 @@ func (f *Field) Update() error {
 func (f *Field) updateLandMovable() {
 	for idx := range f.landMovable {
 		objs := f.Map.GetObjects(base.VertexFromIndex(f.Map.Dimension, idx))
-		fs := flag.None
+		fs := base.None
 		for _, obj := range objs {
-			fs |= flag.Get(obj)
+			fs |= obj.Flag
 		}
-		f.landMovable[idx] = fs.Has(flag.TerrainLand) && fs.Excepts(flag.IsBlockingObject)
+		f.landMovable[idx] = fs.Has(base.TerrainLand) && fs.Excepts(base.IsBlockingObject)
 	}
 }
 

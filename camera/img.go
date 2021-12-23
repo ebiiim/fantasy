@@ -1,4 +1,4 @@
-package img
+package camera
 
 import (
 	"embed"
@@ -13,16 +13,16 @@ import (
 //go:embed assets/*
 var assets embed.FS
 
-var m map[base.Object]*ebiten.Image
+var m map[base.ObjectType]*ebiten.Image
 
 func init() {
-	m = make(map[base.Object]*ebiten.Image)
+	m = make(map[base.ObjectType]*ebiten.Image)
 	initData()
 }
 
-// Get returns the image for the giving Object.
-// Returns ObjUndef if no image is found for `obj`.
-func Get(obj base.Object) *ebiten.Image {
+// GetImg returns the image for the giving ObjectType.
+// Returns ObjUndef if no entry is found for `obj`.
+func GetImg(obj base.ObjectType) *ebiten.Image {
 	v, ok := m[obj]
 	if !ok {
 		return m[base.ObjUndef]

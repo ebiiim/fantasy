@@ -33,8 +33,7 @@ var _ ebiten.Game = (*Game)(nil)
 type Game struct {
 	Field    *field.Field
 	FieldCam *camera.FieldCam
-	Me       base.Object
-	MyLoc    base.Vertex
+	Me       *base.Object
 	ActionCh <-chan base.Action
 }
 
@@ -52,8 +51,7 @@ func NewGame() *Game {
 	g := Game{
 		Field:    f,
 		FieldCam: fcam,
-		Me:       base.ObjMe,
-		MyLoc:    base.NewVertex(6, 5),
+		Me:       base.NewObject(base.ObjMe, base.NewVertex(6, 5)),
 		ActionCh: dev.ActionCh(),
 	}
 	return &g
@@ -72,20 +70,20 @@ func (g *Game) Update() error {
 	case in := <-g.ActionCh:
 		switch in {
 		case base.ActUp:
-			if g.Field.IsMovable(base.NewVertex(g.MyLoc.X, g.MyLoc.Y-1)) {
-				g.MyLoc.Y -= 1
+			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X, g.Me.Loc.Y-1)) {
+				g.Me.Loc.Y -= 1
 			}
 		case base.ActDown:
-			if g.Field.IsMovable(base.NewVertex(g.MyLoc.X, g.MyLoc.Y+1)) {
-				g.MyLoc.Y += 1
+			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X, g.Me.Loc.Y+1)) {
+				g.Me.Loc.Y += 1
 			}
 		case base.ActLeft:
-			if g.Field.IsMovable(base.NewVertex(g.MyLoc.X-1, g.MyLoc.Y)) {
-				g.MyLoc.X -= 1
+			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X-1, g.Me.Loc.Y)) {
+				g.Me.Loc.X -= 1
 			}
 		case base.ActRight:
-			if g.Field.IsMovable(base.NewVertex(g.MyLoc.X+1, g.MyLoc.Y)) {
-				g.MyLoc.X += 1
+			if g.Field.IsMovable(base.NewVertex(g.Me.Loc.X+1, g.Me.Loc.Y)) {
+				g.Me.Loc.X += 1
 			}
 		}
 	}
@@ -100,7 +98,7 @@ var (
 func (g *Game) Draw(screen *ebiten.Image) {
 	start := time.Now()
 
-	g.FieldCam.DrawField(screen, g.Field, g.FieldCam.PositionTopLeft(g.MyLoc))
+	g.FieldCam.DrawField(screen, g.Field, g.FieldCam.PositionTopLeft(g.Me.Loc))
 	g.FieldCam.DrawObject(screen, g.Me, g.FieldCam.PositionCenter())
 
 	g.drawDebugPrints(screen, start)

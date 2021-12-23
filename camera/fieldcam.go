@@ -5,7 +5,6 @@ import (
 
 	"github.com/ebiiim/fantasy/base"
 	"github.com/ebiiim/fantasy/field"
-	"github.com/ebiiim/fantasy/img"
 )
 
 // FieldCam represents the field renderer.
@@ -59,7 +58,7 @@ func (c *FieldCam) DrawLayer(screen *ebiten.Image, l *base.Layer, topLeft base.V
 			pos := base.NewVertex(x, y)
 			loc := topLeft.Add(pos)
 			if loc.IsOutside(l.Dimension) {
-				c.DrawObject(screen, base.ObjBG, pos)
+				c.DrawObject(screen, base.NewObject(base.ObjBG, base.NewVertex(-1, -1)), pos)
 			} else {
 				c.DrawObject(screen, l.GetObject(loc), pos)
 			}
@@ -67,7 +66,7 @@ func (c *FieldCam) DrawLayer(screen *ebiten.Image, l *base.Layer, topLeft base.V
 	}
 }
 
-func (c *FieldCam) DrawObject(screen *ebiten.Image, obj base.Object, pos base.Vertex) {
+func (c *FieldCam) DrawObject(screen *ebiten.Image, obj *base.Object, pos base.Vertex) {
 	if pos.IsOutside(c.DimGrid) {
 		return
 	}
@@ -75,5 +74,5 @@ func (c *FieldCam) DrawObject(screen *ebiten.Image, obj base.Object, pos base.Ve
 	drawY := c.TilePixels.X * pos.Y
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(drawX), float64(drawY))
-	screen.DrawImage(img.Get(obj), op)
+	screen.DrawImage(GetImg(obj.Type), op)
 }

@@ -1,6 +1,4 @@
-package flag
-
-import "github.com/ebiiim/fantasy/base"
+package base
 
 type Flag uint64
 
@@ -50,16 +48,16 @@ const (
 	ItemBox = HasAction | IsBlockingObject
 )
 
-var m map[base.Object]Flag
+var m map[ObjectType]Flag
 
 func init() {
-	m = make(map[base.Object]Flag)
+	m = make(map[ObjectType]Flag)
 	initData()
 }
 
-// Get returns the flag for the giving Object.
-// Returns Undef if no flag is found for `obj`.
-func Get(obj base.Object) Flag {
+// GetDefaultFlags returns the default flags for the giving ObjectType.
+// Returns Undef if no entry is found for `obj`.
+func GetDefaultFlags(obj ObjectType) Flag {
 	v, ok := m[obj]
 	if !ok {
 		return Undef
@@ -67,7 +65,7 @@ func Get(obj base.Object) Flag {
 	return v
 }
 
-func AnyOf(fs ...Flag) Flag {
+func AnyOf(fs []Flag) Flag {
 	f0 := None
 	for _, f := range fs {
 		f0 |= f
@@ -75,7 +73,7 @@ func AnyOf(fs ...Flag) Flag {
 	return f0
 }
 
-func AllOf(fs ...Flag) Flag {
+func AllOf(fs []Flag) Flag {
 	f0 := All
 	for _, f := range fs {
 		f0 &= f
@@ -84,11 +82,11 @@ func AllOf(fs ...Flag) Flag {
 }
 
 func (f0 Flag) Has(fs ...Flag) bool {
-	merged := AnyOf(fs...)
+	merged := AnyOf(fs)
 	return f0&merged == merged
 }
 
 func (f0 Flag) Excepts(fs ...Flag) bool {
-	merged := AnyOf(fs...)
+	merged := AnyOf(fs)
 	return ^f0&merged == merged
 }
