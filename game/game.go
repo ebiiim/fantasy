@@ -3,6 +3,7 @@ package game
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -86,6 +87,14 @@ func (g *Game) Update() error {
 			movedLoc = base.NewVertex(g.Me.Obj().Loc.X-1, g.Me.Obj().Loc.Y)
 		case input.BtnRight:
 			movedLoc = base.NewVertex(g.Me.Obj().Loc.X+1, g.Me.Obj().Loc.Y)
+		case input.BtnA:
+			// add sheep to randam location
+			loc := base.NewVertex(-1, -1)
+			for !g.Field.IsMovable(loc) {
+				loc = base.NewVertex(rand.Intn(g.FieldCam.DimGrid.X), rand.Intn(g.FieldCam.DimGrid.Y))
+			}
+			sp := base.NewSheep(base.NewObject(base.ObjSheep, loc))
+			g.Field.AddIntelligent(sp)
 		}
 		if movedLoc.X != -1 {
 			g.Me.SendMe(base.Action{
@@ -98,7 +107,7 @@ func (g *Game) Update() error {
 }
 
 var (
-	guide          = "Keyboard:\n  Arrow/WASD: Move\nMouse:\n  Left: Move"
+	guide          = "Keyboard:\n  Arrow/WASD: Move\n  Space: Baa\nMouse:\n  Left: Move\n  Right: Baa"
 	drawTime int64 = 0
 )
 
