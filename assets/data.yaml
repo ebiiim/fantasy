@@ -1,28 +1,36 @@
 ---
 - name: ObjUndef
   img: undef.png
-  flags: [BlockAll]
+  flags:
+
 - name: ObjNone
   img: none.png
   flags:
+
 - name: ObjBG
   img: bg.png
   flags: [BlockAll]
-- name: ObjBase
-  img: base.png
-  flags: [Land]
+
+- name: ObjMeadow
+  img: meadow.png
+  flags: [TerrainLand, TerrainSky]
+
 - name: ObjGrass
   img: grass.png
-  flags: [Land]
+  flags: []
+
 - name: ObjTree
   img: tree.png
-  flags: [LandObject]
+  flags: [BlockLand]
+
 - name: ObjBox
   img: box.png
   flags: [ItemBox]
+
 - name: ObjWater
   img: water.png
-  flags: [Sea]
+  flags: [TerrainSea, TerrainSky]
+
 - name: ObjMe
   img: me.png
   flags: [Me]

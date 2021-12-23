@@ -24,11 +24,11 @@ func (f *Field) Update() error {
 func (f *Field) updateLandMovable() {
 	for idx := range f.landMovable {
 		objs := f.Map.GetObjects(base.VertexFromIndex(f.Map.Dimension, idx))
-		movable := flag.None
+		fs := flag.None
 		for _, obj := range objs {
-			movable |= flag.Get(obj)
+			fs |= flag.Get(obj)
 		}
-		f.landMovable[idx] = (movable & flag.BlockLand) != flag.BlockLand
+		f.landMovable[idx] = fs.Has(flag.TerrainLand) && fs.Excepts(flag.IsBlockingObject)
 	}
 }
 

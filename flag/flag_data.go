@@ -5,13 +5,13 @@ package flag
 import "github.com/ebiiim/fantasy/base"
 
 func initData() {
-	m[base.ObjUndef] = BlockAll
+	m[base.ObjUndef] = None
 	m[base.ObjNone] = None
 	m[base.ObjBG] = BlockAll
-	m[base.ObjBase] = Land
-	m[base.ObjGrass] = Land
-	m[base.ObjTree] = LandObject
+	m[base.ObjMeadow] = TerrainLand | TerrainSky
+	m[base.ObjGrass] = None
+	m[base.ObjTree] = BlockLand
 	m[base.ObjBox] = ItemBox
-	m[base.ObjWater] = Sea
+	m[base.ObjWater] = TerrainSea | TerrainSky
 	m[base.ObjMe] = Me
 }
