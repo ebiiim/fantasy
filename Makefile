@@ -1,11 +1,13 @@
 all: ci build-wasm
 
+# some CI environments use shallow clone but we need normal clone for injecting version info
 ci:
 	git fetch --unshallow || true
 	git fetch --tags
 
+# go run always exit with 1 so added `|| true`
 serve:
-	python -m http.server --bind 127.0.0.1 --directory ./dist/wasm 8080
+	go run tool/easy_server/main.go -dir=dist/wasm || true
 
 build-wasm:	./dist/wasm/wasm_exec.js
 	go generate ./... 
