@@ -106,7 +106,6 @@ func (s *Sheep) SendCh() chan<- Action {
 func (s *Sheep) Born(f *Field) {
 	s.field = f
 	for {
-
 		select {
 		case <-s.done:
 			return
@@ -114,16 +113,15 @@ func (s *Sheep) Born(f *Field) {
 			// log.Println("Sheep try to move")
 			axis := rand.Intn(10)     // X:Y=7:3
 			value := rand.Intn(3) - 1 // -1,0,1
-
-			moveLoc := s.obj.Loc
+			var moveAmount Vertex
 			if axis < 3 {
-				moveLoc = NewVertex(moveLoc.X+value, moveLoc.Y)
+				moveAmount = NewVertex(value, 0)
 			} else {
-				moveLoc = NewVertex(moveLoc.X, moveLoc.Y+value)
+				moveAmount = NewVertex(0, value)
 			}
 			act := Action{
-				Type:    ActMove,
-				MoveLoc: moveLoc,
+				Type:       ActMove,
+				MoveAmount: moveAmount,
 			}
 			s.toFieldCh <- act
 		case act := <-s.fromFieldCh:

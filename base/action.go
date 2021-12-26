@@ -12,7 +12,7 @@ type Action struct {
 	Type ActionType
 
 	// Send to Field
-	MoveLoc Vertex
+	MoveAmount Vertex
 
 	// Receive from Field
 	MovedLoc Vertex

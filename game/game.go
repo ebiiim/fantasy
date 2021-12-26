@@ -76,16 +76,16 @@ func (g *Game) Update() error {
 	default:
 		// no input
 	case btn := <-g.ButtonCh:
-		movedLoc := base.NewVertex(-1, -1)
+		var moveAmount base.Vertex
 		switch btn {
 		case input.BtnUp:
-			movedLoc = base.NewVertex(g.Me.Obj().Loc.X, g.Me.Obj().Loc.Y-1)
+			moveAmount = base.NewVertex(0, -1)
 		case input.BtnDown:
-			movedLoc = base.NewVertex(g.Me.Obj().Loc.X, g.Me.Obj().Loc.Y+1)
+			moveAmount = base.NewVertex(0, 1)
 		case input.BtnLeft:
-			movedLoc = base.NewVertex(g.Me.Obj().Loc.X-1, g.Me.Obj().Loc.Y)
+			moveAmount = base.NewVertex(-1, 0)
 		case input.BtnRight:
-			movedLoc = base.NewVertex(g.Me.Obj().Loc.X+1, g.Me.Obj().Loc.Y)
+			moveAmount = base.NewVertex(1, 0)
 		case input.BtnA:
 			// add sheep to randam location
 			loc := base.NewVertex(-1, -1)
@@ -95,10 +95,10 @@ func (g *Game) Update() error {
 			sp := base.NewSheep(base.NewObject(base.ObjSheep, loc))
 			g.Field.AddIntelligent(sp)
 		}
-		if movedLoc.X != -1 {
+		if moveAmount.X+moveAmount.Y != 0 {
 			g.Me.SendMe(base.Action{
-				Type:    base.ActMove,
-				MoveLoc: movedLoc,
+				Type:       base.ActMove,
+				MoveAmount: moveAmount,
 			})
 		}
 	}

@@ -1,5 +1,11 @@
 package base
 
+import (
+	"github.com/ebiiim/fantasy/log"
+)
+
+var lg = log.NewLogger("Field")
+
 type Field struct {
 	Intelligents []Intelligent
 	Map          *Map
@@ -10,7 +16,7 @@ func NewField(m *Map) *Field {
 	f := Field{Map: m}
 	f.landMovable = make([]bool, f.Map.Dimension.X*f.Map.Dimension.Y)
 
-	f.updateLandMovable()
+	f.updateLandMovableAll()
 	return &f
 }
 
@@ -27,12 +33,22 @@ func (f *Field) Update() error {
 		case act := <-intelli.RecvCh():
 			switch act.Type {
 			case ActMove:
-				if f.IsMovable(act.MoveLoc) {
-					// TODO: might block for now
-					intelli.SendCh() <- Action{
-						Type:     ActMoved,
-						MovedLoc: act.MoveLoc,
-					}
+				oldLoc := intelli.Obj().Loc
+				newLoc := oldLoc.Add(act.MoveAmount)
+				// only move {+-1,0} or {0,+-1} for now
+				if newLoc.L1Norm(oldLoc) > 1 {
+					lg.Info(log.TypeValidation, "sheep", "wrong move norm")
+					continue
+				}
+				if !f.IsMovable(newLoc) {
+					continue
+				}
+				f.updateLandMovable(oldLoc) // set default land movable for now
+				f.landMovable[newLoc.ToIndex(f.Map.Dimension)] = false
+				// TODO: might block for now
+				intelli.SendCh() <- Action{
+					Type:     ActMoved,
+					MovedLoc: newLoc,
 				}
 			}
 		}
@@ -40,15 +56,24 @@ func (f *Field) Update() error {
 	return nil
 }
 
-func (f *Field) updateLandMovable() {
+func (f *Field) updateLandMovableAll() {
 	for idx := range f.landMovable {
-		objs := f.Map.GetObjects(VertexFromIndex(f.Map.Dimension, idx))
-		fs := None
-		for _, obj := range objs {
-			fs |= obj.Flag
-		}
-		f.landMovable[idx] = fs.Has(TerrainLand) && fs.Excepts(IsBlockingObject)
+		f.landMovable[idx] = f.calcLandMovable(idx)
 	}
+}
+
+func (f *Field) updateLandMovable(loc Vertex) {
+	idx := loc.ToIndex(f.Map.Dimension)
+	f.landMovable[idx] = f.calcLandMovable(idx)
+}
+
+func (f *Field) calcLandMovable(idx int) bool {
+	objs := f.Map.GetObjects(VertexFromIndex(f.Map.Dimension, idx))
+	fs := None
+	for _, obj := range objs {
+		fs |= obj.Flag
+	}
+	return fs.Has(TerrainLand) && fs.Excepts(IsBlockingObject)
 }
 
 func (f *Field) IsMovable(loc Vertex) bool {

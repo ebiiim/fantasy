@@ -45,3 +45,14 @@ func VertexFromIndex(dim Vertex, idx int) Vertex {
 func (v0 Vertex) IsOutside(dim Vertex) bool {
 	return v0.X < 0 || v0.Y < 0 || v0.X >= dim.X || v0.Y >= dim.Y
 }
+
+func abs(n int) int {
+	if n < 0 {
+		return n * -1
+	}
+	return n
+}
+
+func (v0 Vertex) L1Norm(v Vertex) int {
+	return abs(v.X-v0.X) + abs(v.Y-v0.Y)
+}
