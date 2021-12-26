@@ -19,7 +19,6 @@ var (
 	BuildInfo struct {
 		Version   string
 		BuildDate time.Time
-		GoVersion string
 	}
 )
 

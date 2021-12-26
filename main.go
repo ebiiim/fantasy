@@ -12,7 +12,6 @@ import (
 var (
 	version   string
 	buildDate string
-	goVersion string
 )
 
 func init() {
@@ -32,7 +31,6 @@ func init() {
 	}
 	game.BuildInfo.Version = setIfEmpty(version, "dev")
 	game.BuildInfo.BuildDate = parseDateOrZero(buildDate)
-	game.BuildInfo.GoVersion = goVersion
 }
 
 func main() {

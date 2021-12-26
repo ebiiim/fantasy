@@ -13,12 +13,15 @@ build-wasm:	./dist/wasm/wasm_exec.js
 	go generate ./... 
 	GOOS=js GOARCH=wasm go build \
 	  -o ./dist/wasm/a.wasm \
-	  -ldflags "-X \"main.version=$$(git describe --tags)\" -X \"main.buildDate=$$(LC_TIME=C TZ=Asia/Tokyo date)\" -X \"main.goVersion=$$(go version)\"" ./main.go
+	  -ldflags "-X \"main.version=$$(git describe --tags)\" -X \"main.buildDate=$$(LC_TIME=C TZ=Asia/Tokyo date)\"" ./main.go
 	cp ./web/* ./dist/wasm
 
 build-native:
 	go generate ./... 
-	go build -ldflags "-X \"main.version=$$(git describe --tags)\" -X \"main.buildDate=$$(LC_TIME=C TZ=Asia/Tokyo date)\" -X \"main.goVersion=$$(go version)\"" ./main.go
+	go build -ldflags "-X \"main.version=$$(git describe --tags)\" -X \"main.buildDate=$$(LC_TIME=C TZ=Asia/Tokyo date)\"" ./main.go
+
+clean:
+	rm -rf ./dist/
 
 ./dist/wasm/wasm_exec.js:
 	mkdir -p ./dist/wasm
