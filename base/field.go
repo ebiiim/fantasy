@@ -1,6 +1,8 @@
 package base
 
 import (
+	"fmt"
+
 	"github.com/ebiiim/fantasy/log"
 )
 
@@ -47,13 +49,22 @@ func (f *Field) MoveIntelligent(from, to Vertex) {
 	f.updateLandMovable(to)
 }
 
-func (f *Field) ReplaceIntelligent(i Intelligent, loc Vertex) {
-	oldI := f.layerIntelligents().Objects[loc.ToIndex(f.Map.Dimension)].(Intelligent)
-	oldI.Die(oldI)
+func (f *Field) PutIntelligent(i Intelligent, to Vertex) {
+	if to.IsOutside(f.Map.Dimension) {
+		lg.Error(log.TypeInternal, "Field.PutIntelligent", fmt.Sprintf("put object to wrong place %+v", to))
+		return
+	}
 
-	f.layerIntelligents().Objects[loc.ToIndex(f.Map.Dimension)] = i
-	f.updateLandMovable(loc) // no regarding i.Loc()
-	i.Born(i, f, loc)        // Born sets location by calling i.SetLoc(loc)
+	oldI := f.layerIntelligents().Objects[to.ToIndex(f.Map.Dimension)].(Intelligent)
+	if oldI.ObjectType() != ObjNone {
+		lg.Error(log.TypeInternal, "Field.PutIntelligent", fmt.Sprintf("tried drop non-ObjNone object ObjectType=%v", oldI.ObjectType()))
+		return
+	}
+	//	oldI.Die(oldI) // FIXME: super slow
+
+	f.layerIntelligents().Objects[to.ToIndex(f.Map.Dimension)] = i
+	f.updateLandMovable(to) // no regarding i.Loc
+	i.Born(i, f, to)        // Born sets location by calling i.SetLoc
 }
 
 func (f *Field) Update() error {

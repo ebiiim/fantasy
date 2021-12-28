@@ -17,6 +17,7 @@ const (
 
 	TypeValidation  = "validation"
 	TypeIntelligent = "intelligent"
+	TypeInternal    = "internal"
 )
 
 func NewLogger(component string) *Logger {
