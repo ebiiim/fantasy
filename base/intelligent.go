@@ -29,29 +29,32 @@ var SheepBornFunc = NopBornFunc
 var SheepDieFunc = NopDieFunc
 var SheepActFunc = func(self0 Intelligent) {
 	self := self0.(*Sheep)
-	select {
-	case <-time.After(time.Millisecond * time.Duration(500+rand.Intn(2000))):
-		lg.Debug(log.TypeIntelligent, "SheepActFunc", "try to move")
-		axis := rand.Intn(10)     // X:Y=7:3
-		value := rand.Intn(3) - 1 // -1,0,1
-		var moveAmount Vertex
-		if axis < 3 {
-			moveAmount = NewVertex(value, 0)
-		} else {
-			moveAmount = NewVertex(0, value)
-		}
-		act := Action{
-			Type:       ActMove,
-			MoveAmount: moveAmount,
-		}
-		self.ToFieldCh() <- act
-	case act, ok := <-self.FromFieldCh():
-		if !ok { // died
-			return
-		}
-		switch act.Type {
-		case ActMoved:
-			lg.Debug(log.TypeIntelligent, "SheepActFunc", "baa")
+	for {
+		select {
+		case <-time.After(time.Millisecond * time.Duration(500+rand.Intn(2000))):
+			lg.Debug(log.TypeIntelligent, "SheepActFunc", "try to move")
+			axis := rand.Intn(10)     // X:Y=7:3
+			value := rand.Intn(3) - 1 // -1,0,1
+			var moveAmount Vertex
+			if axis < 3 {
+				moveAmount = NewVertex(value, 0)
+			} else {
+				moveAmount = NewVertex(0, value)
+			}
+			act := Action{
+				Type:       ActMove,
+				MoveAmount: moveAmount,
+			}
+			self.ToFieldCh() <- act
+		case act, ok := <-self.FromFieldCh():
+			if !ok { // died
+				lg.Debug(log.TypeIntelligent, "SheepActionFunc", "I'm dead")
+				return
+			}
+			switch act.Type {
+			case ActMoved:
+				lg.Debug(log.TypeIntelligent, "SheepActFunc", "baa")
+			}
 		}
 	}
 }

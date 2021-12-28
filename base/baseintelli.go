@@ -68,11 +68,7 @@ func (x *BaseIntelligent) Born(self Intelligent, f *Field, loc Vertex) {
 			x.SetLoc(loc)
 			lg.Debug(log.TypeIntelligent, "BaseIntelligent.Born", fmt.Sprintf("ObjectType %v, Loc %v", self.ObjectType(), self.Loc()))
 			x.bornFunc(self)
-			go func() {
-				for {
-					x.actFunc(self)
-				}
-			}()
+			go x.actFunc(self)
 		})
 }
 
@@ -82,8 +78,8 @@ func (x *BaseIntelligent) Die(self Intelligent) {
 		x.dieFunc(self)
 
 		// FIXME: super slow
-		// close(x.toFieldCh)
-		// close(x.fromFieldCh)
+		close(x.toFieldCh)
+		close(x.fromFieldCh)
 	})
 }
 
@@ -95,7 +91,7 @@ var NopActionFunc = func(self Intelligent) {
 	for {
 		_, ok := <-self.FromFieldCh()
 		if !ok {
-			// died
+			lg.Debug(log.TypeIntelligent, "NopActionFunc", "I'm dead")
 			return
 		}
 		// do nothing
