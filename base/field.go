@@ -38,7 +38,7 @@ func (f *Field) layerIntelligents() *Layer {
 
 func (f *Field) MoveIntelligent(from, to Vertex) error {
 	if from.IsOutside(f.Map.Dimension) || to.IsOutside(f.Map.Dimension) {
-		lg.Error(log.TypeValidation, "Field.MoveIntelligent", "move intelligent to wrong location")
+		lg.Error(log.TypeValidation, "Field.MoveIntelligent", "", fmt.Sprintf("move intelligent from/to wrong location from=%+v to=%+v", from, to))
 		return ErrFieldMove
 	}
 	x1 := f.layerIntelligents().Objects[from.ToIndex(f.Map.Dimension)]
@@ -54,13 +54,13 @@ func (f *Field) MoveIntelligent(from, to Vertex) error {
 
 func (f *Field) PutIntelligent(i Intelligent, to Vertex) error {
 	if to.IsOutside(f.Map.Dimension) {
-		lg.Error(log.TypeInternal, "Field.PutIntelligent", fmt.Sprintf("put object to wrong place %+v", to))
+		lg.Error(log.TypeInternal, "Field.PutIntelligent", string(i.ObjectName()), fmt.Sprintf("put object to wrong place %+v", to))
 		return ErrFieldPut
 	}
 
 	oldI := f.layerIntelligents().Objects[to.ToIndex(f.Map.Dimension)].(Intelligent)
 	if oldI.ObjectType() != ObjNone {
-		lg.Error(log.TypeInternal, "Field.PutIntelligent", fmt.Sprintf("tried drop non-ObjNone object ObjectType=%v", oldI.ObjectType()))
+		lg.Error(log.TypeInternal, "Field.PutIntelligent", string(oldI.ObjectName()), fmt.Sprintf("tried to drop non-ObjNone object"))
 		return ErrFieldPut
 	}
 	oldI.Die(oldI)
@@ -70,7 +70,7 @@ func (f *Field) PutIntelligent(i Intelligent, to Vertex) error {
 	i.Born(i, f, to)        // Born sets location by calling i.SetLoc
 
 	f.numIntelligents++
-	lg.Debug(log.TypeInternal, "Field.PutIntelligent", fmt.Sprintf("numIntelligents %d", f.numIntelligents))
+	lg.Debug(log.TypeInternal, "Field.PutIntelligent", "", fmt.Sprintf("numIntelligents %d", f.numIntelligents))
 
 	return nil
 }
@@ -83,14 +83,14 @@ func (f *Field) Update() error {
 		default:
 			// do nothing
 		case act := <-intelli.ToFieldCh():
-			lg.Debug(log.TypeIntelligent, "Field.Update", "recv act from intelligent")
+			lg.Debug(log.TypeIntelligent, "Field.Update", string(intelli.ObjectName()), "received act")
 			switch act.Type {
 			case ActMove:
 				oldLoc := intelli.Loc()
 				newLoc := oldLoc.Add(act.MoveAmount)
 				// only move {+-1,0} or {0,+-1} for now
 				if newLoc.L1Norm(oldLoc) > 1 {
-					lg.Info(log.TypeValidation, "Field.Update", "wrong move norm")
+					lg.Info(log.TypeValidation, "Field.Update", string(intelli.ObjectName()), fmt.Sprintf("wrong move norm %d", newLoc.L1Norm(oldLoc)))
 					continue
 				}
 				if !f.IsMovable(newLoc) {

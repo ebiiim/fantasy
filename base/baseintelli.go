@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/ebiiim/fantasy/log"
+	"github.com/ebiiim/fantasy/util"
 )
 
 type Intelligent interface {
@@ -34,6 +35,8 @@ type BaseIntelligent struct {
 	onceBorn sync.Once
 	onceDie  sync.Once
 }
+
+var _ Intelligent = (*BaseIntelligent)(nil)
 
 func NewIntelligent(obj *BaseObject, bornFunc BornFunc, dieFunc DieFunc, actFunc ActionFunc) *BaseIntelligent {
 	x := BaseIntelligent{
@@ -66,7 +69,7 @@ func (x *BaseIntelligent) Born(self Intelligent, f *Field, loc Vertex) {
 		func() {
 			x.field = f
 			x.SetLoc(loc)
-			lg.Debug(log.TypeIntelligent, "BaseIntelligent.Born", fmt.Sprintf("ObjectType %v, Loc %v", self.ObjectType(), self.Loc()))
+			lg.Debug(log.TypeIntelligent, "BaseIntelligent.Born", string(self.ObjectName()), fmt.Sprintf("Loc %v", self.Loc()))
 			x.bornFunc(self)
 			go x.actFunc(self)
 		})
@@ -74,7 +77,7 @@ func (x *BaseIntelligent) Born(self Intelligent, f *Field, loc Vertex) {
 
 func (x *BaseIntelligent) Die(self Intelligent) {
 	x.onceDie.Do(func() {
-		lg.Debug(log.TypeIntelligent, "BaseIntelligent.Die", fmt.Sprintf("ObjectType %v, Loc %v", self.ObjectType(), self.Loc()))
+		lg.Debug(log.TypeIntelligent, "BaseIntelligent.Die", string(self.ObjectName()), fmt.Sprintf("Loc %v", self.Loc()))
 		x.dieFunc(self)
 
 		// FIXME: super slow
@@ -91,7 +94,7 @@ var NopActionFunc = func(self Intelligent) {
 	for {
 		_, ok := <-self.FromFieldCh()
 		if !ok {
-			lg.Debug(log.TypeIntelligent, "NopActionFunc", "I'm dead")
+			lg.Debug(log.TypeIntelligent, "NopActionFunc", string(self.ObjectName()), "I'm dead")
 			return
 		}
 		// do nothing
@@ -101,5 +104,7 @@ var NopActionFunc = func(self Intelligent) {
 type NopIntelligent struct{ *BaseIntelligent }
 
 func NewNopIntelligent() *NopIntelligent {
-	return &NopIntelligent{BaseIntelligent: NewIntelligent(NewObject(ObjNone, NewVertex(-1, -1)), nil, nil, nil)}
+	return &NopIntelligent{BaseIntelligent: NewIntelligent(NewObject(
+		ObjectName(fmt.Sprintf("NopIntelligent-%s", util.RandStr(6))),
+		ObjNone, NewVertex(-1, -1)), nil, nil, nil)}
 }

@@ -1,5 +1,7 @@
 package base
 
+import "github.com/ebiiim/fantasy/util"
+
 type Vertex struct {
 	X int
 	Y int
@@ -46,13 +48,6 @@ func (v0 Vertex) IsOutside(dim Vertex) bool {
 	return v0.X < 0 || v0.Y < 0 || v0.X >= dim.X || v0.Y >= dim.Y
 }
 
-func abs(n int) int {
-	if n < 0 {
-		return n * -1
-	}
-	return n
-}
-
 func (v0 Vertex) L1Norm(v Vertex) int {
-	return abs(v.X-v0.X) + abs(v.Y-v0.Y)
+	return util.Abs(v.X-v0.X) + util.Abs(v.Y-v0.Y)
 }

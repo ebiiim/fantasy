@@ -14,6 +14,7 @@ type Type string
 const (
 	logType  = "type"
 	logWhere = "where"
+	logObj   = "obj"
 
 	TypeValidation  = "validation"
 	TypeIntelligent = "intelligent"
@@ -24,14 +25,14 @@ func NewLogger(component string) *Logger {
 	return &Logger{logger: zlog.With().Str("component", component).Logger()}
 }
 
-func (l *Logger) Error(lt Type, who string, msg string) {
-	l.logger.Error().Str(logType, string(lt)).Str(logWhere, who).Msg(msg)
+func (l *Logger) Error(lt Type, where, obj, msg string) {
+	l.logger.Error().Str(logType, string(lt)).Str(logWhere, where).Str(logObj, obj).Msg(msg)
 }
 
-func (l *Logger) Info(lt Type, who string, msg string) {
-	l.logger.Info().Str(logType, string(lt)).Str(logWhere, who).Msg(msg)
+func (l *Logger) Info(lt Type, where, obj, msg string) {
+	l.logger.Info().Str(logType, string(lt)).Str(logWhere, where).Str(logObj, obj).Msg(msg)
 }
 
-func (l *Logger) Debug(lt Type, who string, msg string) {
-	l.logger.Debug().Str(logType, string(lt)).Str(logWhere, who).Msg(msg)
+func (l *Logger) Debug(lt Type, where, obj, msg string) {
+	l.logger.Debug().Str(logType, string(lt)).Str(logWhere, where).Str(logObj, obj).Msg(msg)
 }

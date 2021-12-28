@@ -2,6 +2,7 @@ package base
 
 import (
 	"embed"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -54,10 +55,15 @@ func loadBaseObjectsFromStr(dim Vertex, s string) []Locatable {
 	objList := make([]Locatable, len(objStrList))
 	for idx, objStr := range objStrList {
 		v, err := strconv.Atoi(objStr)
+		vtx := VertexFromIndex(dim, idx)
 		if err != nil {
-			objList[idx] = NewObject(ObjUndef, VertexFromIndex(dim, idx))
+			objList[idx] = NewObject(
+				ObjectName(fmt.Sprintf("ErrFromMapLoader-%d_%d", vtx.X, vtx.Y)),
+				ObjUndef, vtx)
 		}
-		objList[idx] = NewObject(ObjectType(v), VertexFromIndex(dim, idx))
+		objList[idx] = NewObject(
+			ObjectName(fmt.Sprintf("ObjFromMapLoader-%d_%d", vtx.X, vtx.Y)),
+			ObjectType(v), vtx)
 	}
 	return objList
 }

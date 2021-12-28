@@ -1,6 +1,8 @@
 package camera
 
 import (
+	"fmt"
+
 	"github.com/hajimehoshi/ebiten/v2"
 
 	"github.com/ebiiim/fantasy/base"
@@ -57,7 +59,9 @@ func (c *FieldCam) DrawLayer(screen *ebiten.Image, l *base.Layer, topLeft base.V
 			pos := base.NewVertex(x, y)
 			loc := topLeft.Add(pos)
 			if loc.IsOutside(l.Dimension) {
-				c.DrawObject(screen, base.NewObject(base.ObjBG, base.NewVertex(-1, -1)), pos)
+				c.DrawObject(screen, base.NewObject(
+					base.ObjectName(fmt.Sprintf("FieldCamBackground-%d_%d", x, y)),
+					base.ObjBG, base.NewVertex(-1, -1)), pos)
 			} else {
 				c.DrawObject(screen, l.GetObject(loc), pos)
 			}

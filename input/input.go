@@ -7,6 +7,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 
 	"github.com/ebiiim/fantasy/base"
+	"github.com/ebiiim/fantasy/util"
 )
 
 type Button uint
@@ -133,13 +134,6 @@ func (m *Mouse) ButtonCh() <-chan Button {
 	return m.btnCh
 }
 
-func abs(n int) int {
-	if n < 0 {
-		return n * -1
-	}
-	return n
-}
-
 func (m *Mouse) ListenLoop(ctx context.Context) {
 	for {
 		select {
@@ -152,10 +146,10 @@ func (m *Mouse) ListenLoop(ctx context.Context) {
 				clicked := base.NewVertex(x, y).Div(m.sizeTilePixel)
 				lr := clicked.X - m.positionGridCenter.X
 				ud := clicked.Y - m.positionGridCenter.Y
-				if abs(lr) == abs(ud) {
+				if util.Abs(lr) == util.Abs(ud) {
 					continue
 				}
-				if abs(lr) < abs(ud) {
+				if util.Abs(lr) < util.Abs(ud) {
 					if ud < 0 {
 						m.btnCh <- BtnUp
 					} else {

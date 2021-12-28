@@ -1,5 +1,9 @@
 package base
 
+import (
+	"fmt"
+)
+
 type LayerName string
 
 type Layer struct {
@@ -19,7 +23,8 @@ func NewLayer(name LayerName, size Vertex, objList []Locatable) *Layer {
 
 func (l *Layer) GetObject(loc Vertex) Locatable {
 	if loc.IsOutside(l.Dimension) {
-		return NewObject(ObjUndef, loc)
+		return NewObject(
+			ObjectName(fmt.Sprintf("MapOutside-%d_%d", loc.X, loc.Y)), ObjUndef, loc)
 	}
 	return l.Objects[loc.ToIndex(l.Dimension)]
 }
