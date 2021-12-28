@@ -8,25 +8,26 @@ import (
 type Intelligent interface {
 	Born(f *Field)
 	Die()
-	Obj() *Object
 	RecvCh() <-chan Action
 	SendCh() chan<- Action
+
+	Locatable
 }
 
 var _ Intelligent = (*Me)(nil)
 var _ Intelligent = (*Sheep)(nil)
 
 type Me struct {
-	obj         *Object
+	*BaseObject
 	toFieldCh   chan Action
 	fromFieldCh chan Action
 	done        chan struct{}
 	field       *Field
 }
 
-func NewMe(obj *Object) *Me {
+func NewMe(obj *BaseObject) *Me {
 	m := Me{
-		obj:         obj,
+		BaseObject:  obj,
 		toFieldCh:   make(chan Action),
 		fromFieldCh: make(chan Action),
 		done:        make(chan struct{}),
@@ -34,56 +35,52 @@ func NewMe(obj *Object) *Me {
 	return &m
 }
 
-func (m *Me) Obj() *Object {
-	return m.obj
+func (x *Me) RecvCh() <-chan Action {
+	return x.toFieldCh
 }
 
-func (m *Me) RecvCh() <-chan Action {
-	return m.toFieldCh
+func (x *Me) SendCh() chan<- Action {
+	return x.fromFieldCh
 }
 
-func (m *Me) SendCh() chan<- Action {
-	return m.fromFieldCh
-}
-
-func (m *Me) SendMe(act Action) {
+func (x *Me) SendMe(act Action) {
 	// log.Println("SendMe")
 	go func() {
-		m.toFieldCh <- act
+		x.toFieldCh <- act
 	}()
 }
 
-func (m *Me) Born(f *Field) {
-	m.field = f
+func (x *Me) Born(f *Field) {
+	x.field = f
 	for {
 		select {
-		case act := <-m.fromFieldCh:
+		case act := <-x.fromFieldCh:
 			switch act.Type {
 			case ActMoved:
 				// log.Println("Moved me")
-				m.obj.Loc = act.MovedLoc
+				x.SetLoc(act.MovedLoc)
 			}
-		case <-m.done:
+		case <-x.done:
 			return
 		}
 	}
 }
 
-func (m *Me) Die() {
-	close(m.done)
+func (x *Me) Die() {
+	close(x.done)
 }
 
 type Sheep struct {
-	obj         *Object
+	*BaseObject
 	toFieldCh   chan Action
 	fromFieldCh chan Action
 	done        chan struct{}
 	field       *Field
 }
 
-func NewSheep(obj *Object) *Sheep {
+func NewSheep(obj *BaseObject) *Sheep {
 	s := Sheep{
-		obj:         obj,
+		BaseObject:      obj,
 		toFieldCh:   make(chan Action),
 		fromFieldCh: make(chan Action),
 		done:        make(chan struct{}),
@@ -91,23 +88,19 @@ func NewSheep(obj *Object) *Sheep {
 	return &s
 }
 
-func (s *Sheep) Obj() *Object {
-	return s.obj
+func (x *Sheep) RecvCh() <-chan Action {
+	return x.toFieldCh
 }
 
-func (s *Sheep) RecvCh() <-chan Action {
-	return s.toFieldCh
+func (x *Sheep) SendCh() chan<- Action {
+	return x.fromFieldCh
 }
 
-func (s *Sheep) SendCh() chan<- Action {
-	return s.fromFieldCh
-}
-
-func (s *Sheep) Born(f *Field) {
-	s.field = f
+func (x *Sheep) Born(f *Field) {
+	x.field = f
 	for {
 		select {
-		case <-s.done:
+		case <-x.done:
 			return
 		case <-time.After(time.Millisecond * time.Duration(500+rand.Intn(2000))):
 			// log.Println("Sheep try to move")
@@ -123,17 +116,17 @@ func (s *Sheep) Born(f *Field) {
 				Type:       ActMove,
 				MoveAmount: moveAmount,
 			}
-			s.toFieldCh <- act
-		case act := <-s.fromFieldCh:
+			x.toFieldCh <- act
+		case act := <-x.fromFieldCh:
 			switch act.Type {
 			case ActMoved:
 				// log.Println("Sheep moved")
-				s.obj.Loc = act.MovedLoc
+				x.SetLoc(act.MovedLoc)
 			}
 		}
 	}
 }
 
-func (s *Sheep) Die() {
-	close(s.done)
+func (x *Sheep) Die() {
+	close(x.done)
 }

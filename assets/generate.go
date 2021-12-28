@@ -7,7 +7,7 @@
 //   - ./map/ -> base/assets/
 //
 // Generates: (uses the file passed by os.Args[1] as input)
-//   - base/object_data.go
+//   - base/objtype_data.go
 //   - camera/img_data.go
 //   - base/flag_data.go
 
@@ -15,8 +15,9 @@
 //go:generate cp -r img/ ../camera/assets/
 //go:generate rm -rf ../base/assets
 //go:generate cp -r map/ ../base/assets/
+
 //go:generate go run generate.go data.yaml
-//go:generate go fmt ../base/object_data.go
+//go:generate go fmt ../base/objtype_data.go
 
 package main
 
@@ -82,8 +83,8 @@ func mergeFlags(d []*ObjectData) {
 func main() {
 	src := os.Args[1]
 
-	objTmpl := "object_data.go.tmpl"
-	objDst := "../base/object_data.go"
+	objTmpl := "objtype_data.go.tmpl"
+	objDst := "../base/objtype_data.go"
 
 	imgTmpl := "img_data.go.tmpl"
 	imgDst := "../camera/img_data.go"

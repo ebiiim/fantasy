@@ -113,10 +113,10 @@ var (
 func (g *Game) Draw(screen *ebiten.Image) {
 	start := time.Now()
 
-	g.FieldCam.DrawField(screen, g.Field, g.FieldCam.PositionTopLeft(g.Me.Obj().Loc))
+	g.FieldCam.DrawField(screen, g.Field, g.FieldCam.PositionTopLeft(g.Me.Loc()))
 
 	for _, intelli := range g.Field.Intelligents {
-		g.FieldCam.DrawObject(screen, intelli.Obj(), intelli.Obj().Loc.Sub(g.FieldCam.PositionTopLeft(g.Me.Obj().Loc)))
+		g.FieldCam.DrawObject(screen, intelli, intelli.Loc().Sub(g.FieldCam.PositionTopLeft(g.Me.Loc())))
 	}
 
 	g.drawDebugPrints(screen, start)

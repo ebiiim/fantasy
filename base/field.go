@@ -33,7 +33,7 @@ func (f *Field) Update() error {
 		case act := <-intelli.RecvCh():
 			switch act.Type {
 			case ActMove:
-				oldLoc := intelli.Obj().Loc
+				oldLoc := intelli.Loc()
 				newLoc := oldLoc.Add(act.MoveAmount)
 				// only move {+-1,0} or {0,+-1} for now
 				if newLoc.L1Norm(oldLoc) > 1 {
@@ -71,7 +71,7 @@ func (f *Field) calcLandMovable(idx int) bool {
 	objs := f.Map.GetObjects(VertexFromIndex(f.Map.Dimension, idx))
 	fs := None
 	for _, obj := range objs {
-		fs |= obj.Flag
+		fs |= obj.Flag()
 	}
 	return fs.Has(TerrainLand) && fs.Excepts(IsBlockingObject)
 }

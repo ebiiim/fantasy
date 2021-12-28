@@ -65,7 +65,7 @@ func (c *FieldCam) DrawLayer(screen *ebiten.Image, l *base.Layer, topLeft base.V
 	}
 }
 
-func (c *FieldCam) DrawObject(screen *ebiten.Image, obj *base.Object, pos base.Vertex) {
+func (c *FieldCam) DrawObject(screen *ebiten.Image, obj base.Locatable, pos base.Vertex) {
 	if pos.IsOutside(c.DimGrid) {
 		return
 	}
@@ -73,5 +73,5 @@ func (c *FieldCam) DrawObject(screen *ebiten.Image, obj *base.Object, pos base.V
 	drawY := c.TilePixels.X * pos.Y
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(drawX), float64(drawY))
-	screen.DrawImage(GetImg(obj.Type), op)
+	screen.DrawImage(GetImg(obj.ObjectType()), op)
 }

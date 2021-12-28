@@ -39,19 +39,19 @@ func MustLoadMap(file string) *Map {
 	dim := NewVertex(md.Dimension.X, md.Dimension.Y)
 	ls := make([]*Layer, len(md.Layers))
 	for idx, v := range md.Layers {
-		ls[idx] = NewLayer(LayerName(v.Name), dim, loadLayerFromStr(dim, v.Objects))
+		ls[idx] = NewLayer(LayerName(v.Name), dim, loadBaseObjectsFromStr(dim, v.Objects))
 	}
 
 	return NewMap(MapName(md.Name), dim, ls)
 }
 
-// loadLayerFromStr loads Objects from a string.
+// loadBaseObjectsFromStr loads BaseObjects from a string.
 // Cf. object_data.go
-func loadLayerFromStr(dim Vertex, s string) []*Object {
+func loadBaseObjectsFromStr(dim Vertex, s string) []Locatable {
 	ss := strings.ReplaceAll(s, "\n", " ")
 	ss = strings.Trim(ss, " ")
 	objStrList := strings.Split(ss, " ")
-	objList := make([]*Object, len(objStrList))
+	objList := make([]Locatable, len(objStrList))
 	for idx, objStr := range objStrList {
 		v, err := strconv.Atoi(objStr)
 		if err != nil {
