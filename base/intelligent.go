@@ -17,6 +17,47 @@ type Intelligent interface {
 var _ Intelligent = (*Me)(nil)
 var _ Intelligent = (*Sheep)(nil)
 
+type NopIntelligent struct {
+	*BaseObject
+	toFieldCh   chan Action
+	fromFieldCh chan Action
+	done        chan struct{}
+	field       *Field
+}
+
+func NewNopIntelligent(obj *BaseObject) *NopIntelligent {
+	x := NopIntelligent{
+		BaseObject:  obj,
+		toFieldCh:   make(chan Action),
+		fromFieldCh: make(chan Action),
+		done:        make(chan struct{}),
+	}
+	return &x
+}
+
+func (x *NopIntelligent) RecvCh() <-chan Action {
+	return x.toFieldCh
+}
+
+func (x *NopIntelligent) SendCh() chan<- Action {
+	return x.fromFieldCh
+}
+
+func (x *NopIntelligent) Born(f *Field) {
+	for {
+		select {
+		case <-x.fromFieldCh:
+			// do nothing
+		case <-x.done:
+			return
+		}
+	}
+}
+
+func (x *NopIntelligent) Die() {
+	close(x.done)
+}
+
 type Me struct {
 	*BaseObject
 	toFieldCh   chan Action
@@ -57,8 +98,7 @@ func (x *Me) Born(f *Field) {
 		case act := <-x.fromFieldCh:
 			switch act.Type {
 			case ActMoved:
-				// log.Println("Moved me")
-				x.SetLoc(act.MovedLoc)
+				// log.Println("Me: I'm moved")
 			}
 		case <-x.done:
 			return
@@ -80,7 +120,7 @@ type Sheep struct {
 
 func NewSheep(obj *BaseObject) *Sheep {
 	s := Sheep{
-		BaseObject:      obj,
+		BaseObject:  obj,
 		toFieldCh:   make(chan Action),
 		fromFieldCh: make(chan Action),
 		done:        make(chan struct{}),
@@ -120,8 +160,7 @@ func (x *Sheep) Born(f *Field) {
 		case act := <-x.fromFieldCh:
 			switch act.Type {
 			case ActMoved:
-				// log.Println("Sheep moved")
-				x.SetLoc(act.MovedLoc)
+				// log.Println("Sheep: I'm moved")
 			}
 		}
 	}

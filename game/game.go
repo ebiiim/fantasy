@@ -45,10 +45,10 @@ func NewGame() *Game {
 	sheep1 := base.NewSheep(base.NewObject(base.ObjSheep, base.NewVertex(4, 5)))
 	sheep2 := base.NewSheep(base.NewObject(base.ObjSheep, base.NewVertex(10, 8)))
 	sheep3 := base.NewSheep(base.NewObject(base.ObjSheep, base.NewVertex(15, 4)))
-	f.AddIntelligent(me)
-	f.AddIntelligent(sheep1)
-	f.AddIntelligent(sheep2)
-	f.AddIntelligent(sheep3)
+	f.ReplaceIntelligent(me, me.Loc())
+	f.ReplaceIntelligent(sheep1, sheep1.Loc())
+	f.ReplaceIntelligent(sheep2, sheep2.Loc())
+	f.ReplaceIntelligent(sheep3, sheep3.Loc())
 
 	fcam := camera.NewFieldCam(dimCameraTiles, tilePixels)
 	kbd := input.NewKeyboard()
@@ -93,7 +93,7 @@ func (g *Game) Update() error {
 				loc = base.NewVertex(rand.Intn(g.FieldCam.DimGrid.X), rand.Intn(g.FieldCam.DimGrid.Y))
 			}
 			sp := base.NewSheep(base.NewObject(base.ObjSheep, loc))
-			g.Field.AddIntelligent(sp)
+			g.Field.ReplaceIntelligent(sp, sp.Loc())
 		}
 		if moveAmount.X+moveAmount.Y != 0 {
 			g.Me.SendMe(base.Action{
@@ -114,10 +114,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	start := time.Now()
 
 	g.FieldCam.DrawField(screen, g.Field, g.FieldCam.PositionTopLeft(g.Me.Loc()))
-
-	for _, intelli := range g.Field.Intelligents {
-		g.FieldCam.DrawObject(screen, intelli, intelli.Loc().Sub(g.FieldCam.PositionTopLeft(g.Me.Loc())))
-	}
 
 	g.drawDebugPrints(screen, start)
 }

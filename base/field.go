@@ -7,26 +7,56 @@ import (
 var lg = log.NewLogger("Field")
 
 type Field struct {
-	Intelligents []Intelligent
-	Map          *Map
-	landMovable  []bool
+	Map         *Map
+	landMovable []bool
 }
 
 func NewField(m *Map) *Field {
 	f := Field{Map: m}
 	f.landMovable = make([]bool, f.Map.Dimension.X*f.Map.Dimension.Y)
 
+	ints := make([]Locatable, m.Dimension.X*m.Dimension.Y)
+	for idx := range ints {
+		i := NewNopIntelligent(NewObject(ObjNone, VertexFromIndex(m.Dimension, idx)))
+		go i.Born(&f)
+		ints[idx] = i
+	}
+	f.Map.Layers = append(f.Map.Layers, NewLayer("intelligents", m.Dimension, ints))
+
 	f.updateLandMovableAll()
 	return &f
 }
 
-func (f *Field) AddIntelligent(i Intelligent) {
-	f.Intelligents = append(f.Intelligents, i)
+func (f *Field) layerIntelligents() *Layer {
+	return f.Map.Layers[len(f.Map.Layers)-1]
+}
+
+func (f *Field) MoveIntelligent(from, to Vertex) {
+	if from.IsOutside(f.Map.Dimension) || to.IsOutside(f.Map.Dimension) {
+		lg.Error(log.TypeValidation, "field", "move intelligent to wrong location")
+		return
+	}
+	x1 := f.layerIntelligents().Objects[from.ToIndex(f.Map.Dimension)]
+	x2 := f.layerIntelligents().Objects[to.ToIndex(f.Map.Dimension)]
+	x1.SetLoc(to)
+	x2.SetLoc(from)
+	f.layerIntelligents().Objects[to.ToIndex(f.Map.Dimension)] = x1
+	f.layerIntelligents().Objects[from.ToIndex(f.Map.Dimension)] = x2
+	f.updateLandMovable(from)
+	f.updateLandMovable(to)
+}
+
+func (f *Field) ReplaceIntelligent(i Intelligent, loc Vertex) {
+	i.SetLoc(loc)
+	f.layerIntelligents().Objects[loc.ToIndex(f.Map.Dimension)] = i
+	f.updateLandMovable(loc)
 	go i.Born(f)
 }
 
 func (f *Field) Update() error {
-	for _, intelli := range f.Intelligents {
+	for _, i := range f.layerIntelligents().Objects {
+		// TODO: might use generics
+		intelli := i.(Intelligent)
 		select {
 		default:
 			// do nothing
@@ -43,8 +73,7 @@ func (f *Field) Update() error {
 				if !f.IsMovable(newLoc) {
 					continue
 				}
-				f.updateLandMovable(oldLoc) // set default land movable for now
-				f.landMovable[newLoc.ToIndex(f.Map.Dimension)] = false
+				f.MoveIntelligent(oldLoc, newLoc)
 				// TODO: might block for now
 				intelli.SendCh() <- Action{
 					Type:     ActMoved,
