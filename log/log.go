@@ -12,10 +12,11 @@ type Logger struct {
 type Type string
 
 const (
-	logType = "type"
-	logWho  = "who"
+	logType  = "type"
+	logWhere = "where"
 
-	TypeValidation = "validation"
+	TypeValidation  = "validation"
+	TypeIntelligent = "intelligent"
 )
 
 func NewLogger(component string) *Logger {
@@ -23,13 +24,13 @@ func NewLogger(component string) *Logger {
 }
 
 func (l *Logger) Error(lt Type, who string, msg string) {
-	l.logger.Error().Str(logType, string(lt)).Str(logWho, who).Msg(msg)
+	l.logger.Error().Str(logType, string(lt)).Str(logWhere, who).Msg(msg)
 }
 
 func (l *Logger) Info(lt Type, who string, msg string) {
-	l.logger.Info().Str(logType, string(lt)).Str(logWho, who).Msg(msg)
+	l.logger.Info().Str(logType, string(lt)).Str(logWhere, who).Msg(msg)
 }
 
 func (l *Logger) Debug(lt Type, who string, msg string) {
-	l.logger.Debug().Str(logType, string(lt)).Str(logWho, who).Msg(msg)
+	l.logger.Debug().Str(logType, string(lt)).Str(logWhere, who).Msg(msg)
 }

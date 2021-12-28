@@ -41,14 +41,14 @@ func NewGame() *Game {
 	m := base.MustLoadMap("assets/map01.yaml")
 	f := base.NewField(m)
 
-	me := base.NewMe(base.NewObject(base.ObjMe, base.NewVertex(6, 5)))
-	sheep1 := base.NewSheep(base.NewObject(base.ObjSheep, base.NewVertex(4, 5)))
-	sheep2 := base.NewSheep(base.NewObject(base.ObjSheep, base.NewVertex(10, 8)))
-	sheep3 := base.NewSheep(base.NewObject(base.ObjSheep, base.NewVertex(15, 4)))
-	f.ReplaceIntelligent(me, me.Loc())
-	f.ReplaceIntelligent(sheep1, sheep1.Loc())
-	f.ReplaceIntelligent(sheep2, sheep2.Loc())
-	f.ReplaceIntelligent(sheep3, sheep3.Loc())
+	me := base.NewMe()
+	sheep1 := base.NewSheep()
+	sheep2 := base.NewSheep()
+	sheep3 := base.NewSheep()
+	f.ReplaceIntelligent(me, base.NewVertex(6, 5))
+	f.ReplaceIntelligent(sheep1, base.NewVertex(4, 5))
+	f.ReplaceIntelligent(sheep2, base.NewVertex(10, 8))
+	f.ReplaceIntelligent(sheep3, base.NewVertex(15, 4))
 
 	fcam := camera.NewFieldCam(dimCameraTiles, tilePixels)
 	kbd := input.NewKeyboard()
@@ -92,14 +92,17 @@ func (g *Game) Update() error {
 			for !g.Field.IsMovable(loc) {
 				loc = base.NewVertex(rand.Intn(g.FieldCam.DimGrid.X), rand.Intn(g.FieldCam.DimGrid.Y))
 			}
-			sp := base.NewSheep(base.NewObject(base.ObjSheep, loc))
+			sp := base.NewSheep()
 			g.Field.ReplaceIntelligent(sp, sp.Loc())
 		}
 		if moveAmount.X+moveAmount.Y != 0 {
-			g.Me.SendMe(base.Action{
-				Type:       base.ActMove,
-				MoveAmount: moveAmount,
-			})
+			ch := g.Me.ToFieldCh()
+			go func() {
+				ch <- base.Action{
+					Type:       base.ActMove,
+					MoveAmount: moveAmount,
+				}
+			}()
 		}
 	}
 	return nil

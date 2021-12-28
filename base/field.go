@@ -15,10 +15,11 @@ func NewField(m *Map) *Field {
 	f := Field{Map: m}
 	f.landMovable = make([]bool, f.Map.Dimension.X*f.Map.Dimension.Y)
 
+	// init the intelligents layer with NopIntelligent
 	ints := make([]Locatable, m.Dimension.X*m.Dimension.Y)
 	for idx := range ints {
-		i := NewNopIntelligent(NewObject(ObjNone, VertexFromIndex(m.Dimension, idx)))
-		go i.Born(&f)
+		i := NewNopIntelligent()
+		i.Born(i, &f, VertexFromIndex(m.Dimension, idx))
 		ints[idx] = i
 	}
 	f.Map.Layers = append(f.Map.Layers, NewLayer("intelligents", m.Dimension, ints))
@@ -33,7 +34,7 @@ func (f *Field) layerIntelligents() *Layer {
 
 func (f *Field) MoveIntelligent(from, to Vertex) {
 	if from.IsOutside(f.Map.Dimension) || to.IsOutside(f.Map.Dimension) {
-		lg.Error(log.TypeValidation, "field", "move intelligent to wrong location")
+		lg.Error(log.TypeValidation, "Field.MoveIntelligent", "move intelligent to wrong location")
 		return
 	}
 	x1 := f.layerIntelligents().Objects[from.ToIndex(f.Map.Dimension)]
@@ -47,10 +48,12 @@ func (f *Field) MoveIntelligent(from, to Vertex) {
 }
 
 func (f *Field) ReplaceIntelligent(i Intelligent, loc Vertex) {
-	i.SetLoc(loc)
+	oldI := f.layerIntelligents().Objects[loc.ToIndex(f.Map.Dimension)].(Intelligent)
+	oldI.Die(oldI)
+
 	f.layerIntelligents().Objects[loc.ToIndex(f.Map.Dimension)] = i
-	f.updateLandMovable(loc)
-	go i.Born(f)
+	f.updateLandMovable(loc) // no regarding i.Loc()
+	i.Born(i, f, loc)        // Born sets location by calling i.SetLoc(loc)
 }
 
 func (f *Field) Update() error {
@@ -60,14 +63,15 @@ func (f *Field) Update() error {
 		select {
 		default:
 			// do nothing
-		case act := <-intelli.RecvCh():
+		case act := <-intelli.ToFieldCh():
+			lg.Debug(log.TypeIntelligent, "Field.Update", "recv act from intelligent")
 			switch act.Type {
 			case ActMove:
 				oldLoc := intelli.Loc()
 				newLoc := oldLoc.Add(act.MoveAmount)
 				// only move {+-1,0} or {0,+-1} for now
 				if newLoc.L1Norm(oldLoc) > 1 {
-					lg.Info(log.TypeValidation, "sheep", "wrong move norm")
+					lg.Info(log.TypeValidation, "Field.Update", "wrong move norm")
 					continue
 				}
 				if !f.IsMovable(newLoc) {
@@ -75,7 +79,7 @@ func (f *Field) Update() error {
 				}
 				f.MoveIntelligent(oldLoc, newLoc)
 				// TODO: might block for now
-				intelli.SendCh() <- Action{
+				intelli.FromFieldCh() <- Action{
 					Type:     ActMoved,
 					MovedLoc: newLoc,
 				}

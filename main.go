@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/rs/zerolog"
 
 	"github.com/ebiiim/fantasy/game"
 )
@@ -34,6 +35,7 @@ func init() {
 }
 
 func main() {
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 
 	g := game.NewGame()
 	x, y := g.Layout(0, 0)
