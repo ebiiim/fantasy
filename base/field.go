@@ -36,10 +36,10 @@ func (f *Field) layerIntelligents() *Layer {
 	return f.Map.Layers[len(f.Map.Layers)-1]
 }
 
-func (f *Field) MoveIntelligent(from, to Vertex) {
+func (f *Field) MoveIntelligent(from, to Vertex) error {
 	if from.IsOutside(f.Map.Dimension) || to.IsOutside(f.Map.Dimension) {
 		lg.Error(log.TypeValidation, "Field.MoveIntelligent", "move intelligent to wrong location")
-		return
+		return ErrFieldMove
 	}
 	x1 := f.layerIntelligents().Objects[from.ToIndex(f.Map.Dimension)]
 	x2 := f.layerIntelligents().Objects[to.ToIndex(f.Map.Dimension)]
@@ -49,18 +49,19 @@ func (f *Field) MoveIntelligent(from, to Vertex) {
 	f.layerIntelligents().Objects[from.ToIndex(f.Map.Dimension)] = x2
 	f.updateLandMovable(from)
 	f.updateLandMovable(to)
+	return nil
 }
 
-func (f *Field) PutIntelligent(i Intelligent, to Vertex) {
+func (f *Field) PutIntelligent(i Intelligent, to Vertex) error {
 	if to.IsOutside(f.Map.Dimension) {
 		lg.Error(log.TypeInternal, "Field.PutIntelligent", fmt.Sprintf("put object to wrong place %+v", to))
-		return
+		return ErrFieldPut
 	}
 
 	oldI := f.layerIntelligents().Objects[to.ToIndex(f.Map.Dimension)].(Intelligent)
 	if oldI.ObjectType() != ObjNone {
 		lg.Error(log.TypeInternal, "Field.PutIntelligent", fmt.Sprintf("tried drop non-ObjNone object ObjectType=%v", oldI.ObjectType()))
-		return
+		return ErrFieldPut
 	}
 	//	oldI.Die(oldI) // FIXME: super slow
 
@@ -70,6 +71,8 @@ func (f *Field) PutIntelligent(i Intelligent, to Vertex) {
 
 	f.numIntelligents++
 	lg.Debug(log.TypeInternal, "Field.PutIntelligent", fmt.Sprintf("numIntelligents %d", f.numIntelligents))
+
+	return nil
 }
 
 func (f *Field) Update() error {
@@ -93,7 +96,7 @@ func (f *Field) Update() error {
 				if !f.IsMovable(newLoc) {
 					continue
 				}
-				f.MoveIntelligent(oldLoc, newLoc)
+				_ = f.MoveIntelligent(oldLoc, newLoc)
 				// TODO: might block for now
 				intelli.FromFieldCh() <- Action{
 					Type:     ActMoved,

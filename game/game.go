@@ -45,10 +45,10 @@ func NewGame() *Game {
 	sheep1 := base.NewSheep()
 	sheep2 := base.NewSheep()
 	sheep3 := base.NewSheep()
-	f.PutIntelligent(me, base.NewVertex(6, 5))
-	f.PutIntelligent(sheep1, base.NewVertex(4, 5))
-	f.PutIntelligent(sheep2, base.NewVertex(10, 8))
-	f.PutIntelligent(sheep3, base.NewVertex(15, 4))
+	_ = f.PutIntelligent(me, base.NewVertex(6, 5))
+	_ = f.PutIntelligent(sheep1, base.NewVertex(4, 5))
+	_ = f.PutIntelligent(sheep2, base.NewVertex(10, 8))
+	_ = f.PutIntelligent(sheep3, base.NewVertex(15, 4))
 
 	fcam := camera.NewFieldCam(dimCameraTiles, tilePixels)
 	kbd := input.NewKeyboard()
@@ -93,7 +93,7 @@ func (g *Game) Update() error {
 				loc = base.NewVertex(rand.Intn(g.FieldCam.DimGrid.X), rand.Intn(g.FieldCam.DimGrid.Y))
 			}
 			sp := base.NewSheep()
-			g.Field.PutIntelligent(sp, loc)
+			_ = g.Field.PutIntelligent(sp, loc)
 		}
 		if moveAmount.X+moveAmount.Y != 0 {
 			ch := g.Me.ToFieldCh()
