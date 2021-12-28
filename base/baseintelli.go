@@ -58,9 +58,9 @@ func (x *BaseIntelligent) ToFieldCh() chan Action { return x.toFieldCh }
 func (x *BaseIntelligent) FromFieldCh() chan Action { return x.fromFieldCh }
 
 func (x *BaseIntelligent) Born(self Intelligent, f *Field, loc Vertex) {
-	lg.Debug(log.TypeIntelligent, "BaseIntelligent.Born", fmt.Sprintf("ObjectType %v, Loc %v", self.ObjectType(), self.Loc()))
 	x.field = f
 	x.SetLoc(loc)
+	lg.Debug(log.TypeIntelligent, "BaseIntelligent.Born", fmt.Sprintf("ObjectType %v, Loc %v", self.ObjectType(), self.Loc()))
 	x.bornFunc(self)
 	go func() {
 		for {

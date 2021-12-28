@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"time"
 
@@ -35,7 +36,25 @@ func init() {
 }
 
 func main() {
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+
+	var logLevel int
+	flag.IntVar(&logLevel, "v", 1, "log level")
+	flag.Parse()
+
+	switch logLevel {
+	default:
+		zerolog.SetGlobalLevel(zerolog.FatalLevel)
+	case 1:
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+	case 2:
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
+	case 3:
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	case 4:
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	case 5:
+		zerolog.SetGlobalLevel(zerolog.TraceLevel)
+	}
 
 	g := game.NewGame()
 	x, y := g.Layout(0, 0)

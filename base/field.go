@@ -11,6 +11,8 @@ var lg = log.NewLogger("Field")
 type Field struct {
 	Map         *Map
 	landMovable []bool
+
+	numIntelligents int
 }
 
 func NewField(m *Map) *Field {
@@ -65,6 +67,9 @@ func (f *Field) PutIntelligent(i Intelligent, to Vertex) {
 	f.layerIntelligents().Objects[to.ToIndex(f.Map.Dimension)] = i
 	f.updateLandMovable(to) // no regarding i.Loc
 	i.Born(i, f, to)        // Born sets location by calling i.SetLoc
+
+	f.numIntelligents++
+	lg.Debug(log.TypeInternal, "Field.PutIntelligent", fmt.Sprintf("numIntelligents %d", f.numIntelligents))
 }
 
 func (f *Field) Update() error {
