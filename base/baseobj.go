@@ -2,7 +2,7 @@ package base
 
 type ObjectName string
 
-type Locatable interface {
+type Object interface {
 	ObjectName() ObjectName
 	ObjectType() ObjectType
 
@@ -20,7 +20,7 @@ type BaseObject struct {
 	flag    Flag
 }
 
-var _ Locatable = (*BaseObject)(nil)
+var _ Object = (*BaseObject)(nil)
 
 func NewObject(n ObjectName, t ObjectType, loc Vertex) *BaseObject {
 	o := BaseObject{
@@ -31,8 +31,6 @@ func NewObject(n ObjectName, t ObjectType, loc Vertex) *BaseObject {
 	}
 	return &o
 }
-
-var _ Locatable = (*BaseObject)(nil)
 
 func (o *BaseObject) ObjectName() ObjectName { return o.objName }
 

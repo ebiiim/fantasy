@@ -20,7 +20,7 @@ func NewField(m *Map) *Field {
 	f.landMovable = make([]bool, f.Map.Dimension.X*f.Map.Dimension.Y)
 
 	// init the intelligents layer with NopIntelligent
-	ints := make([]Locatable, m.Dimension.X*m.Dimension.Y)
+	ints := make([]Object, m.Dimension.X*m.Dimension.Y)
 	for idx := range ints {
 		i := NewNopIntelligent()
 		i.Born(i, &f, VertexFromIndex(m.Dimension, idx))

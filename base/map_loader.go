@@ -48,11 +48,11 @@ func MustLoadMap(file string) *Map {
 
 // loadBaseObjectsFromStr loads BaseObjects from a string.
 // Cf. object_data.go
-func loadBaseObjectsFromStr(dim Vertex, s string) []Locatable {
+func loadBaseObjectsFromStr(dim Vertex, s string) []Object {
 	ss := strings.ReplaceAll(s, "\n", " ")
 	ss = strings.Trim(ss, " ")
 	objStrList := strings.Split(ss, " ")
-	objList := make([]Locatable, len(objStrList))
+	objList := make([]Object, len(objStrList))
 	for idx, objStr := range objStrList {
 		v, err := strconv.Atoi(objStr)
 		vtx := VertexFromIndex(dim, idx)

@@ -9,10 +9,10 @@ type LayerName string
 type Layer struct {
 	Name      LayerName
 	Dimension Vertex
-	Objects   []Locatable
+	Objects   []Object
 }
 
-func NewLayer(name LayerName, size Vertex, objList []Locatable) *Layer {
+func NewLayer(name LayerName, size Vertex, objList []Object) *Layer {
 	l := Layer{
 		Name:      name,
 		Dimension: size,
@@ -21,7 +21,7 @@ func NewLayer(name LayerName, size Vertex, objList []Locatable) *Layer {
 	return &l
 }
 
-func (l *Layer) GetObject(loc Vertex) Locatable {
+func (l *Layer) GetObject(loc Vertex) Object {
 	if loc.IsOutside(l.Dimension) {
 		return NewObject(
 			ObjectName(fmt.Sprintf("MapOutside-%d_%d", loc.X, loc.Y)), ObjUndef, loc)
@@ -29,7 +29,7 @@ func (l *Layer) GetObject(loc Vertex) Locatable {
 	return l.Objects[loc.ToIndex(l.Dimension)]
 }
 
-func (l *Layer) GetObjectOrErr(loc Vertex) (Locatable, error) {
+func (l *Layer) GetObjectOrErr(loc Vertex) (Object, error) {
 	if loc.IsOutside(l.Dimension) {
 		return nil, ErrNoObjectFound
 	}

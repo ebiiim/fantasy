@@ -69,7 +69,7 @@ func (c *FieldCam) DrawLayer(screen *ebiten.Image, l *base.Layer, topLeft base.V
 	}
 }
 
-func (c *FieldCam) DrawObject(screen *ebiten.Image, obj base.Locatable, pos base.Vertex) {
+func (c *FieldCam) DrawObject(screen *ebiten.Image, obj base.Object, pos base.Vertex) {
 	if pos.IsOutside(c.DimGrid) {
 		return
 	}

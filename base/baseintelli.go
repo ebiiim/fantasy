@@ -14,7 +14,7 @@ type Intelligent interface {
 	ToFieldCh() chan Action
 	FromFieldCh() chan Action
 
-	Locatable
+	Object
 }
 
 type BornFunc func(self0 Intelligent)
