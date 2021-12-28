@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.4 - 2021-12-28
+
+Internal improvements.
+
+### Added
+
+- interface Intelligent that makes it easier to implement characters
+
+### Changed
+
+- many refactorings
+
 ## 0.0.3 - 2021-12-24
 
 Baa Baa.
