@@ -38,7 +38,7 @@ var SheepActFunc = func(self0 Intelligent) {
 	for {
 		select {
 		case <-time.After(time.Millisecond * time.Duration(500+rand.Intn(2000))):
-			lg.Debug(log.TypeIntelligent, "SheepActFunc", string(self.ObjectName()), "try to move")
+			lg.Trace(log.TypeIntelligent, "SheepActFunc", string(self.ObjectName()), "try to move")
 			axis := rand.Intn(10)     // X:Y=7:3
 			value := rand.Intn(3) - 1 // -1,0,1
 			var moveAmount Vertex
@@ -59,7 +59,7 @@ var SheepActFunc = func(self0 Intelligent) {
 			}
 			switch act.Type {
 			case ActMoved:
-				lg.Debug(log.TypeIntelligent, "SheepActFunc", string(self.ObjectName()), "baa")
+				lg.Trace(log.TypeIntelligent, "SheepActFunc", string(self.ObjectName()), "baa")
 			}
 		}
 	}

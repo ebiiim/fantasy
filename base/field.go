@@ -60,7 +60,7 @@ func (f *Field) PutIntelligent(i Intelligent, to Vertex) error {
 
 	oldI := f.layerIntelligents().Objects[to.ToIndex(f.Map.Dimension)].(Intelligent)
 	if oldI.ObjectType() != ObjNone {
-		lg.Error(log.TypeInternal, "Field.PutIntelligent", string(oldI.ObjectName()), fmt.Sprintf("tried to drop non-ObjNone object"))
+		lg.Error(log.TypeInternal, "Field.PutIntelligent", string(oldI.ObjectName()), "tried to drop non-ObjNone object")
 		return ErrFieldPut
 	}
 	oldI.Die(oldI)
@@ -83,14 +83,14 @@ func (f *Field) Update() error {
 		default:
 			// do nothing
 		case act := <-intelli.ToFieldCh():
-			lg.Debug(log.TypeIntelligent, "Field.Update", string(intelli.ObjectName()), "received act")
+			lg.Trace(log.TypeIntelligent, "Field.Update", string(intelli.ObjectName()), "received act")
 			switch act.Type {
 			case ActMove:
 				oldLoc := intelli.Loc()
 				newLoc := oldLoc.Add(act.MoveAmount)
 				// only move {+-1,0} or {0,+-1} for now
 				if newLoc.L1Norm(oldLoc) > 1 {
-					lg.Info(log.TypeValidation, "Field.Update", string(intelli.ObjectName()), fmt.Sprintf("wrong move norm %d", newLoc.L1Norm(oldLoc)))
+					lg.Warn(log.TypeValidation, "Field.Update", string(intelli.ObjectName()), fmt.Sprintf("wrong move norm %d", newLoc.L1Norm(oldLoc)))
 					continue
 				}
 				if !f.IsMovable(newLoc) {
