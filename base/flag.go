@@ -42,8 +42,8 @@ const (
 	BlockSea  = IsBlockingObject | IsInSea
 	BlockSky  = IsBlockingObject | IsInSky
 
-	FlagMe      = IsCharacter | IsPlayer | IsMe | CanOnLand
-	FlagPlayer  = IsCharacter | IsPlayer | HasAction | CanOnLand
+	FlagMe      = IsCharacter | IsPlayer | IsMe | IsBlockingObject | CanOnLand
+	FlagPlayer  = IsCharacter | IsPlayer | HasAction | IsBlockingObject | CanOnLand
 	FlagNPC     = IsCharacter | IsNPC | HasAction | IsBlockingObject | CanOnLand
 	FlagItemBox = HasAction | IsBlockingObject
 )
