@@ -2,6 +2,7 @@ package base
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/ebiiim/fantasy/log"
 )
@@ -29,6 +30,9 @@ type BaseIntelligent struct {
 	bornFunc BornFunc
 	dieFunc  DieFunc
 	actFunc  ActionFunc
+
+	onceBorn sync.Once
+	onceDie  sync.Once
 }
 
 func NewIntelligent(obj *BaseObject, bornFunc BornFunc, dieFunc DieFunc, actFunc ActionFunc) *BaseIntelligent {
@@ -58,22 +62,29 @@ func (x *BaseIntelligent) ToFieldCh() chan Action { return x.toFieldCh }
 func (x *BaseIntelligent) FromFieldCh() chan Action { return x.fromFieldCh }
 
 func (x *BaseIntelligent) Born(self Intelligent, f *Field, loc Vertex) {
-	x.field = f
-	x.SetLoc(loc)
-	lg.Debug(log.TypeIntelligent, "BaseIntelligent.Born", fmt.Sprintf("ObjectType %v, Loc %v", self.ObjectType(), self.Loc()))
-	x.bornFunc(self)
-	go func() {
-		for {
-			x.actFunc(self)
-		}
-	}()
+	x.onceBorn.Do(
+		func() {
+			x.field = f
+			x.SetLoc(loc)
+			lg.Debug(log.TypeIntelligent, "BaseIntelligent.Born", fmt.Sprintf("ObjectType %v, Loc %v", self.ObjectType(), self.Loc()))
+			x.bornFunc(self)
+			go func() {
+				for {
+					x.actFunc(self)
+				}
+			}()
+		})
 }
 
 func (x *BaseIntelligent) Die(self Intelligent) {
-	lg.Debug(log.TypeIntelligent, "BaseIntelligent.Die", fmt.Sprintf("ObjectType %v, Loc %v", self.ObjectType(), self.Loc()))
-	x.dieFunc(self)
-	close(x.toFieldCh)
-	close(x.fromFieldCh)
+	x.onceDie.Do(func() {
+		lg.Debug(log.TypeIntelligent, "BaseIntelligent.Die", fmt.Sprintf("ObjectType %v, Loc %v", self.ObjectType(), self.Loc()))
+		x.dieFunc(self)
+
+		// FIXME: super slow
+		// close(x.toFieldCh)
+		// close(x.fromFieldCh)
+	})
 }
 
 var NopBornFunc = func(self Intelligent) {}

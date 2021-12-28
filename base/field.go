@@ -63,7 +63,7 @@ func (f *Field) PutIntelligent(i Intelligent, to Vertex) error {
 		lg.Error(log.TypeInternal, "Field.PutIntelligent", fmt.Sprintf("tried drop non-ObjNone object ObjectType=%v", oldI.ObjectType()))
 		return ErrFieldPut
 	}
-	//	oldI.Die(oldI) // FIXME: super slow
+	oldI.Die(oldI)
 
 	f.layerIntelligents().Objects[to.ToIndex(f.Map.Dimension)] = i
 	f.updateLandMovable(to) // no regarding i.Loc
