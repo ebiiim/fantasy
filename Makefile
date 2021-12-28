@@ -18,7 +18,7 @@ build-wasm:	./dist/wasm/wasm_exec.js
 
 build-native:
 	go generate ./... 
-	go build -ldflags "-X \"main.version=$$(git describe --tags)\" -X \"main.buildDate=$$(LC_TIME=C TZ=Asia/Tokyo date)\"" ./main.go
+	go build -race -ldflags "-X \"main.version=$$(git describe --tags)\" -X \"main.buildDate=$$(LC_TIME=C TZ=Asia/Tokyo date)\"" ./main.go
 
 clean:
 	rm -rf ./dist/
