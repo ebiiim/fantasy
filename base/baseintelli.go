@@ -69,7 +69,7 @@ func (x *BaseIntelligent) Born(self Intelligent, f *Field, loc Vertex) {
 		func() {
 			x.field = f
 			x.SetLoc(loc)
-			lg.Debug(log.TypeIntelligent, "BaseIntelligent.Born", string(self.ObjectName()), fmt.Sprintf("Loc %v", self.Loc()))
+			lg.Debug(log.TypeIntelligent, "BaseIntelligent.Born", string(self.ObjectName()), "Loc %v", self.Loc())
 			x.bornFunc(self)
 			go x.actFunc(self)
 		})
@@ -77,7 +77,7 @@ func (x *BaseIntelligent) Born(self Intelligent, f *Field, loc Vertex) {
 
 func (x *BaseIntelligent) Die(self Intelligent) {
 	x.onceDie.Do(func() {
-		lg.Debug(log.TypeIntelligent, "BaseIntelligent.Die", string(self.ObjectName()), fmt.Sprintf("Loc %v", self.Loc()))
+		lg.Debug(log.TypeIntelligent, "BaseIntelligent.Die", string(self.ObjectName()), "Loc %v", self.Loc())
 		x.dieFunc(self)
 
 		// FIXME: super slow

@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"runtime"
 	"time"
 
@@ -68,7 +67,7 @@ func main() {
 			<-time.After(5 * time.Second)
 			n := runtime.NumGoroutine()
 			runtime.ReadMemStats(&mem)
-			lg.Info(log.TypeSystem, "main", "", fmt.Sprintf("NumGoroutine=%d MemAlloc=%dKB Uptime=%v", n, mem.Alloc/1024, time.Since(startTime).Round(time.Second)))
+			lg.Info(log.TypeSystem, "main", "", "NumGoroutine=%d MemAlloc=%dKB Uptime=%v", n, mem.Alloc/1024, time.Since(startTime).Round(time.Second))
 		}
 	}()
 
@@ -78,6 +77,6 @@ func main() {
 	ebiten.SetWindowTitle("fantasy")
 
 	if err := ebiten.RunGame(g); err != nil {
-		lg.Fatal(log.TypeSystem, "main", "", fmt.Sprintf("RunGame returned error %v", err))
+		lg.Fatal(log.TypeSystem, "main", "", "RunGame returned error %v", err)
 	}
 }
