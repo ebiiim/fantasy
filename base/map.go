@@ -32,3 +32,14 @@ func (m *Map) GetObjectsOrErr(loc Vertex) ([]Object, error) {
 	}
 	return objs, nil
 }
+
+func (m *Map) GetObjectByName(name ObjectName) (Object, error) {
+	// TODO: this is O(n), so consider changing data structure
+	for _, l := range m.Layers {
+		obj, err := l.GetObjectByName(name)
+		if err == nil { // found
+			return obj, nil
+		}
+	}
+	return nil, ErrNoObjectFound
+}

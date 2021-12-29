@@ -35,3 +35,13 @@ func (l *Layer) GetObjectOrErr(loc Vertex) (Object, error) {
 	}
 	return l.Objects[loc.ToIndex(l.Dimension)], nil
 }
+
+func (l *Layer) GetObjectByName(name ObjectName) (Object, error) {
+	// TODO: this is O(n), so consider changing data structure
+	for _, obj := range l.Objects {
+		if obj.ObjectName() == name {
+			return obj, nil
+		}
+	}
+	return nil, ErrNoObjectFound
+}
