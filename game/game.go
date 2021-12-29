@@ -50,6 +50,9 @@ func NewGame() *Game {
 	_ = f.PutIntelligent(sheep2, base.NewVertex(10, 8))
 	_ = f.PutIntelligent(sheep3, base.NewVertex(15, 4))
 
+	m1 := base.NewMonster()
+	_ = f.PutIntelligent(m1, base.NewVertex(8, 4))
+
 	fcam := camera.NewFieldCam(dimCameraTiles, tilePixels)
 	kbd := input.NewKeyboard()
 	mouse := input.NewMouse(fcam.PositionCenter(), tilePixels)

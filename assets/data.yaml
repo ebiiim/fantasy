@@ -35,6 +35,10 @@
   img: sheep.png
   flags: [FlagNPC]
 
+- name: ObjMonster
+  img: monster.png
+  flags: [FlagNPC]
+
 - name: ObjMe
   img: me.png
   flags: [FlagMe]

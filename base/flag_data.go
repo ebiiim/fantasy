@@ -12,5 +12,6 @@ func initData() {
 	m[ObjBox] = FlagItemBox
 	m[ObjWater] = TerrainSea | TerrainSky
 	m[ObjSheep] = FlagNPC
+	m[ObjMonster] = FlagNPC
 	m[ObjMe] = FlagMe
 }

@@ -16,5 +16,6 @@ func initData() {
 	m[base.ObjBox] = load("assets/box.png")
 	m[base.ObjWater] = load("assets/water.png")
 	m[base.ObjSheep] = load("assets/sheep.png")
+	m[base.ObjMonster] = load("assets/monster.png")
 	m[base.ObjMe] = load("assets/me.png")
 }

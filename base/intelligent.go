@@ -64,3 +64,47 @@ var SheepActFunc = func(self0 Intelligent) {
 		}
 	}
 }
+
+type Monster struct {
+	*BaseIntelligent
+}
+
+func NewMonster() *Monster {
+	return &Monster{BaseIntelligent: NewIntelligent(NewObject(
+		ObjectName(fmt.Sprintf("Monster-%s", util.RandStr(6))),
+		ObjMonster, NewVertex(-1, -1)), MonsterBornFunc, MonsterDieFunc, MonsterActFunc)}
+}
+
+var MonsterBornFunc = NopBornFunc
+var MonsterDieFunc = NopDieFunc
+var MonsterActFunc = func(self0 Intelligent) {
+	self := self0.(*Monster)
+	for {
+		select {
+		case <-time.After(time.Millisecond * time.Duration(100+rand.Intn(100))):
+			lg.Trace(log.TypeIntelligent, "MonsterActFunc", string(self.ObjectName()), "try to move")
+			axis := rand.Intn(10)     // X:Y=7:3
+			value := rand.Intn(3) - 1 // -1,0,1
+			var moveAmount Vertex
+			if axis < 3 {
+				moveAmount = NewVertex(value, 0)
+			} else {
+				moveAmount = NewVertex(0, value)
+			}
+			act := Action{
+				Type:       ActMove,
+				MoveAmount: moveAmount,
+			}
+			self.ToFieldCh() <- act
+		case act, ok := <-self.FromFieldCh():
+			if !ok { // died
+				lg.Debug(log.TypeIntelligent, "MonsterActionFunc", string(self.ObjectName()), "I'm dead")
+				return
+			}
+			switch act.Type {
+			case ActMoved:
+				lg.Trace(log.TypeIntelligent, "MonsterActFunc", string(self.ObjectName()), "baa")
+			}
+		}
+	}
+}

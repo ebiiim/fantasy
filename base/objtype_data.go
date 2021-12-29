@@ -3,14 +3,15 @@
 package base
 
 const (
-	ObjUndef  ObjectType = iota // 0
-	ObjNone                     // 1
-	ObjBG                       // 2
-	ObjMeadow                   // 3
-	ObjGrass                    // 4
-	ObjTree                     // 5
-	ObjBox                      // 6
-	ObjWater                    // 7
-	ObjSheep                    // 8
-	ObjMe                       // 9
+	ObjUndef   ObjectType = iota // 0
+	ObjNone                      // 1
+	ObjBG                        // 2
+	ObjMeadow                    // 3
+	ObjGrass                     // 4
+	ObjTree                      // 5
+	ObjBox                       // 6
+	ObjWater                     // 7
+	ObjSheep                     // 8
+	ObjMonster                   // 9
+	ObjMe                        // 10
 )
