@@ -4,16 +4,20 @@ type ActionType uint
 
 const (
 	ActUndefined ActionType = iota
+
 	ActMove
-	ActMoved
+
+	ActEcho
+
+	// ActDie tells field to remove the actor
+	ActDie
 )
 
 type Action struct {
 	Type ActionType
 
-	// Send to Field
 	MoveAmount Vertex
 
-	// Receive from Field
-	MovedLoc Vertex
+	EchoWho  ObjectName
+	EchoBody string
 }

@@ -12,7 +12,10 @@ import (
 	"github.com/ebiiim/fantasy/base"
 	"github.com/ebiiim/fantasy/camera"
 	"github.com/ebiiim/fantasy/input"
+	"github.com/ebiiim/fantasy/log"
 )
+
+var lg = log.NewLogger("Game")
 
 var (
 	// values decided at compile time and injected by main function
@@ -36,6 +39,8 @@ type Game struct {
 	ButtonCh <-chan input.Button
 }
 
+const monsterName = "m1"
+
 func NewGame() *Game {
 
 	m := base.MustLoadMap("assets/map01.yaml")
@@ -50,7 +55,7 @@ func NewGame() *Game {
 	_ = f.PutIntelligent(sheep2, base.NewVertex(10, 8))
 	_ = f.PutIntelligent(sheep3, base.NewVertex(15, 4))
 
-	m1 := base.NewMonster()
+	m1 := base.NewMonster(base.ObjectName(monsterName))
 	_ = f.PutIntelligent(m1, base.NewVertex(8, 4))
 
 	fcam := camera.NewFieldCam(dimCameraTiles, tilePixels)
@@ -97,6 +102,16 @@ func (g *Game) Update() error {
 			}
 			sp := base.NewSheep()
 			_ = g.Field.PutIntelligent(sp, loc)
+		case input.BtnB:
+			// kill the monster
+			ch := g.Me.ToFieldCh()
+			go func() {
+				ch <- base.Action{
+					Type:     base.ActEcho,
+					EchoWho:  monsterName,
+					EchoBody: "hello world",
+				}
+			}()
 		}
 		if moveAmount.X+moveAmount.Y != 0 {
 			ch := g.Me.ToFieldCh()
@@ -112,7 +127,7 @@ func (g *Game) Update() error {
 }
 
 var (
-	guide          = "Keyboard:\n  Arrow/WASD: Move\n  Space: Baa\nMouse:\n  Left: Move\n  Right: Baa"
+	guide          = "Keyboard:\n  Arrow/WASD: Move\n  Space: Baa\n  X: Boom\nMouse:\n  Left: Move\n  Right: Baa\n  Middle: Boom"
 	drawTime int64 = 0
 )
 

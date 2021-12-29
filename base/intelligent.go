@@ -58,7 +58,7 @@ var SheepActFunc = func(self0 Intelligent) {
 				return
 			}
 			switch act.Type {
-			case ActMoved:
+			case ActMove:
 				lg.Trace(log.TypeIntelligent, "SheepActFunc", string(self.ObjectName()), "baa")
 			}
 		}
@@ -69,10 +69,8 @@ type Monster struct {
 	*BaseIntelligent
 }
 
-func NewMonster() *Monster {
-	return &Monster{BaseIntelligent: NewIntelligent(NewObject(
-		ObjectName(fmt.Sprintf("Monster-%s", util.RandStr(6))),
-		ObjMonster, NewVertex(-1, -1)), MonsterBornFunc, MonsterDieFunc, MonsterActFunc)}
+func NewMonster(name ObjectName) *Monster {
+	return &Monster{BaseIntelligent: NewIntelligent(NewObject(name, ObjMonster, NewVertex(-1, -1)), MonsterBornFunc, MonsterDieFunc, MonsterActFunc)}
 }
 
 var MonsterBornFunc = NopBornFunc
@@ -102,8 +100,11 @@ var MonsterActFunc = func(self0 Intelligent) {
 				return
 			}
 			switch act.Type {
-			case ActMoved:
-				lg.Trace(log.TypeIntelligent, "MonsterActFunc", string(self.ObjectName()), "baa")
+			case ActMove:
+				lg.Trace(log.TypeIntelligent, "MonsterActFunc", string(self.ObjectName()), "wow")
+			case ActEcho:
+				lg.Debug(log.TypeIntelligent, "MonsterActFunc", string(self.ObjectName()), "echo from=%v body=%v", act.EchoWho, act.EchoBody)
+				self.ToFieldCh() <- Action{Type: ActDie}
 			}
 		}
 	}

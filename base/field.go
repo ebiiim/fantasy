@@ -1,8 +1,6 @@
 package base
 
 import (
-	"fmt"
-
 	"github.com/ebiiim/fantasy/log"
 )
 
@@ -38,7 +36,7 @@ func (f *Field) layerIntelligents() *Layer {
 
 func (f *Field) MoveIntelligent(from, to Vertex) error {
 	if from.IsOutside(f.Map.Dimension) || to.IsOutside(f.Map.Dimension) {
-		lg.Error(log.TypeValidation, "Field.MoveIntelligent", "", fmt.Sprintf("move intelligent from/to wrong location from=%+v to=%+v", from, to))
+		lg.Error(log.TypeValidation, "Field.MoveIntelligent", "", "move intelligent from/to wrong location from=%+v to=%+v", from, to)
 		return ErrFieldMove
 	}
 	x1 := f.layerIntelligents().Objects[from.ToIndex(f.Map.Dimension)]
@@ -54,7 +52,7 @@ func (f *Field) MoveIntelligent(from, to Vertex) error {
 
 func (f *Field) PutIntelligent(i Intelligent, to Vertex) error {
 	if to.IsOutside(f.Map.Dimension) {
-		lg.Error(log.TypeInternal, "Field.PutIntelligent", string(i.ObjectName()), fmt.Sprintf("put object to wrong place %+v", to))
+		lg.Error(log.TypeInternal, "Field.PutIntelligent", string(i.ObjectName()), "put object to wrong place %+v", to)
 		return ErrFieldPut
 	}
 
@@ -70,7 +68,29 @@ func (f *Field) PutIntelligent(i Intelligent, to Vertex) error {
 	i.Born(i, f, to)        // Born sets location by calling i.SetLoc
 
 	f.numIntelligents++
-	lg.Debug(log.TypeInternal, "Field.PutIntelligent", "", fmt.Sprintf("numIntelligents %d", f.numIntelligents))
+	lg.Debug(log.TypeInternal, "Field.PutIntelligent", string(i.ObjectName()), "numIntelligents %d", f.numIntelligents)
+
+	return nil
+}
+
+func (f *Field) DeleteIntelligent(i Intelligent) error {
+	_, err := f.Map.GetObjectByName(i.ObjectName())
+	if err != nil {
+		lg.Error(log.TypeInternal, "Field.DeleteIntelligent", string(i.ObjectName()), "name not found in Map")
+		return ErrFieldDelete
+	}
+
+	loc := i.Loc()
+	i.Die(i)
+
+	newI := NewNopIntelligent()
+	f.layerIntelligents().Objects[loc.ToIndex(f.Map.Dimension)] = newI
+
+	f.updateLandMovable(loc)
+	newI.Born(newI, f, loc)
+
+	f.numIntelligents--
+	lg.Debug(log.TypeInternal, "Field.DeleteIntelligent", string(i.ObjectName()), "numIntelligents %d", f.numIntelligents)
 
 	return nil
 }
@@ -90,18 +110,41 @@ func (f *Field) Update() error {
 				newLoc := oldLoc.Add(act.MoveAmount)
 				// only move {+-1,0} or {0,+-1} for now
 				if newLoc.L1Norm(oldLoc) > 1 {
-					lg.Warn(log.TypeValidation, "Field.Update", string(intelli.ObjectName()), fmt.Sprintf("wrong move norm %d", newLoc.L1Norm(oldLoc)))
+					lg.Warn(log.TypeValidation, "Field.Update", string(intelli.ObjectName()), "wrong move norm %d", newLoc.L1Norm(oldLoc))
 					continue
 				}
 				if !f.IsMovable(newLoc) {
 					continue
 				}
 				_ = f.MoveIntelligent(oldLoc, newLoc)
-				// TODO: might block for now
-				intelli.FromFieldCh() <- Action{
-					Type:     ActMoved,
-					MovedLoc: newLoc,
+				// TODO: potential goroutine leak, consider set timeout
+				go func() {
+					intelli.FromFieldCh() <- Action{
+						Type:       ActMove,
+						MoveAmount: act.MoveAmount,
+					}
+				}()
+			case ActEcho:
+				dst, err := f.Map.GetObjectByName(act.EchoWho)
+				if err != nil {
+					continue
 				}
+				dstI, ok := dst.(Intelligent)
+				if !ok {
+					lg.Warn(log.TypeValidation, "Field.Update", string(dst.ObjectName()), "type annotation failed")
+					continue
+				}
+				// TODO: potential goroutine leak, consider set timeout
+				go func() {
+					dstI.FromFieldCh() <- Action{
+						Type:     ActEcho,
+						EchoWho:  intelli.ObjectName(),
+						EchoBody: act.EchoBody,
+					}
+				}()
+			case ActDie:
+				lg.Debug(log.TypeIntelligent, "Field.Update", string(intelli.ObjectName()), "recv ActDie")
+				_ = f.DeleteIntelligent(intelli)
 			}
 		}
 	}
