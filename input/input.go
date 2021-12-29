@@ -105,8 +105,11 @@ func (k *Keyboard) ListenLoop(ctx context.Context) {
 			case ebiten.IsKeyPressed(ebiten.KeyD) || ebiten.IsKeyPressed(ebiten.KeyArrowRight):
 				k.btnCh <- BtnRight
 				<-time.After(1000 / 6 * time.Millisecond)
-			case ebiten.IsKeyPressed(ebiten.KeySpace):
+			case ebiten.IsKeyPressed(ebiten.KeySpace), ebiten.IsKeyPressed(ebiten.KeyZ):
 				k.btnCh <- BtnA
+				<-time.After(1000 / 6 * time.Millisecond)
+			case ebiten.IsKeyPressed(ebiten.KeyF), ebiten.IsKeyPressed(ebiten.KeyX):
+				k.btnCh <- BtnB
 				<-time.After(1000 / 6 * time.Millisecond)
 			}
 		}
@@ -165,6 +168,9 @@ func (m *Mouse) ListenLoop(ctx context.Context) {
 				<-time.After(1000 / 6 * time.Millisecond)
 			case ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight):
 				m.btnCh <- BtnA
+				<-time.After(1000 / 6 * time.Millisecond)
+			case ebiten.IsMouseButtonPressed(ebiten.MouseButtonMiddle):
+				m.btnCh <- BtnB
 				<-time.After(1000 / 6 * time.Millisecond)
 			}
 		}
