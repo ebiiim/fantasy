@@ -12,11 +12,11 @@ var fontPixelMplusBold *sfnt.Font
 
 func init() {
 	var err error
-	fontPixelMplusRegular, err = loadFont("assets/PixelMplus-20130602/PixelMplus12-Regular.ttf")
+	fontPixelMplusRegular, err = loadFont("assets/font/PixelMplus-20130602/PixelMplus12-Regular.ttf")
 	if err != nil {
 		panic(err)
 	}
-	fontPixelMplusBold, err = loadFont("assets/PixelMplus-20130602/PixelMplus12-Bold.ttf")
+	fontPixelMplusBold, err = loadFont("assets/font/PixelMplus-20130602/PixelMplus12-Bold.ttf")
 	if err != nil {
 		panic(err)
 	}

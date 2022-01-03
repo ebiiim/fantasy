@@ -3,9 +3,9 @@
 //   2. Generating consts for assets from the giving YAML file.
 //
 // Copies:
-//   - ./font/ -> camera/assets/
-//   - ./img/ -> camera/assets/
-//   - ./map/ -> base/assets/
+//   - ./font/ -> camera/assets/font/
+//   - ./img/ -> camera/assets/img/
+//   - ./map/ -> base/assets/map/
 //
 // Generates: (uses the file passed by os.Args[1] as input)
 //   - base/objtype_data.go
@@ -14,12 +14,12 @@
 
 //go:generate rm -rf ../camera/assets
 //go:generate mkdir -p ../camera/assets
-//go:generate cp img/* ../camera/assets/
-//go:generate cp -r font/* ../camera/assets/
+//go:generate cp -r img/ ../camera/assets
+//go:generate cp -r font/ ../camera/assets
 
 //go:generate rm -rf ../base/assets
-//go:generate mkdir -p ../base/assets/
-//go:generate cp map/* ../base/assets/
+//go:generate mkdir -p ../base/assets
+//go:generate cp -r map/ ../base/assets
 
 //go:generate go run generate.go data.yaml
 //go:generate go fmt ../base/objtype_data.go

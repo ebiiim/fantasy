@@ -45,7 +45,7 @@ const monsterName = "m1"
 
 func NewGame() *Game {
 
-	m := base.MustLoadMap("assets/map01.yaml")
+	m := base.MustLoadMap("assets/map/map01.yaml")
 	f := base.NewField(m)
 
 	me := base.NewMe()
