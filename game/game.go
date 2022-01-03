@@ -3,6 +3,7 @@ package game
 import (
 	"context"
 	"fmt"
+	"image/color"
 	"math/rand"
 	"time"
 
@@ -33,10 +34,11 @@ var (
 var _ ebiten.Game = (*Game)(nil)
 
 type Game struct {
-	Field    *base.Field
-	FieldCam *camera.FieldCam
-	Me       *base.Me
-	ButtonCh <-chan input.Button
+	Field      *base.Field
+	FieldCam   *camera.FieldCam
+	TextDrawer *camera.TextDrawer
+	Me         *base.Me
+	ButtonCh   <-chan input.Button
 }
 
 const monsterName = "m1"
@@ -64,11 +66,17 @@ func NewGame() *Game {
 	dev := input.NewJoinedDevice(kbd, mouse)
 	go dev.ListenLoop(context.Background())
 
+	td, err := camera.NewTextDrawer(18.0)
+	if err != nil {
+		lg.Fatal(log.TypeInternal, "NewGame", "", "could not load font err=%v", err)
+	}
+
 	g := Game{
-		Field:    f,
-		FieldCam: fcam,
-		Me:       me,
-		ButtonCh: dev.ButtonCh(),
+		Field:      f,
+		FieldCam:   fcam,
+		TextDrawer: td,
+		Me:         me,
+		ButtonCh:   dev.ButtonCh(),
 	}
 	return &g
 }
@@ -148,6 +156,7 @@ func (g *Game) drawDebugPrints(screen *ebiten.Image, started time.Time) {
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Version: %s", BuildInfo.Version), x/100*75, y-30)
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Build date: %s", BuildInfo.BuildDate.Format(time.RFC822)), x/100*75, y-15)
 
+	g.TextDrawer.Draw(screen, "謹賀新年", base.NewVertex(10, 200), color.White, true, true)
 }
 
 // Layout returns the screen resolution that is needed to draw the grid.

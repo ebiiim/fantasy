@@ -30,8 +30,8 @@ func GetImg(obj base.ObjectType) *ebiten.Image {
 	return v
 }
 
-// load loads images and panics if it fails.
-func load(file string) *ebiten.Image {
+// loadImg loads images and panics if it fails.
+func loadImg(file string) *ebiten.Image {
 	f, err := assets.Open(file)
 	if err != nil {
 		panic(err)

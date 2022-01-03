@@ -8,6 +8,6 @@ import (
 
 func initData() {
 	{{- range . }}
-	m[base.{{ .Name }}] = load("assets/{{ .Img }}")
+	m[base.{{ .Name }}] = loadImg("assets/{{ .Img }}")
 	{{- end }}
 }
