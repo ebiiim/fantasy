@@ -47,15 +47,15 @@ func GetImg(obj base.ObjectType, posture base.Posture) *ebiten.Image {
 	return m[base.ObjUndef][base.PosNone]
 }
 
-// loadImg loads images and panics if it fails.
+// loadImg loads images or log.Fatal.
 func loadImg(file string) *ebiten.Image {
 	f, err := assets.Open(file)
 	if err != nil {
-		panic(err)
+		lg.Fatal(log.TypeInit, "Img.loadImg", "", "load img err=", err)
 	}
 	im, _, err := image.Decode(f)
 	if err != nil {
-		panic(err)
+		lg.Fatal(log.TypeInit, "Img.loadImg", "", "decode img err=", err)
 	}
 	return ebiten.NewImageFromImage(im)
 }

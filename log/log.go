@@ -20,6 +20,7 @@ const (
 	TypeIntelligent = "intelligent"
 	TypeInternal    = "internal"
 	TypeSystem      = "system"
+	TypeInit        = "init"
 )
 
 func NewLogger(component string) *Logger {

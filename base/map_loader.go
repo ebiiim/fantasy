@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"gopkg.in/yaml.v2"
+
+	"github.com/ebiiim/fantasy/log"
 )
 
 // mapData represents the internal data structure for map YAML files.
@@ -27,15 +29,15 @@ type mapData struct {
 //go:embed assets/*
 var assets embed.FS
 
-// MustLoadMap loads a Map from the given YAML file and panics if it fails.
+// MustLoadMap loads a Map from the given YAML file or log.Fatal.
 func MustLoadMap(file string) *Map {
 	f, err := assets.Open(file)
 	if err != nil {
-		panic(err)
+		lg.Fatal(log.TypeInit, "MustLoadMap", "", "load map err=", err)
 	}
 	var md mapData
 	if err := yaml.NewDecoder(f).Decode(&md); err != nil {
-		panic(err)
+		lg.Fatal(log.TypeInit, "MustLoadMap", "", "decode map err=", err)
 	}
 	dim := NewVertex(md.Dimension.X, md.Dimension.Y)
 	ls := make([]*Layer, len(md.Layers))
