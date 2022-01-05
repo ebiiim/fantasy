@@ -3,19 +3,56 @@
 package camera
 
 import (
+	"github.com/hajimehoshi/ebiten/v2"
+
 	"github.com/ebiiim/fantasy/base"
 )
 
 func initData() {
-	m[base.ObjUndef] = loadImg("assets/img/undef.png")
-	m[base.ObjNone] = loadImg("assets/img/none.png")
-	m[base.ObjBG] = loadImg("assets/img/bg.png")
-	m[base.ObjMeadow] = loadImg("assets/img/meadow.png")
-	m[base.ObjGrass] = loadImg("assets/img/grass.png")
-	m[base.ObjTree] = loadImg("assets/img/tree.png")
-	m[base.ObjBox] = loadImg("assets/img/box.png")
-	m[base.ObjWater] = loadImg("assets/img/water.png")
-	m[base.ObjSheep] = loadImg("assets/img/sheep.png")
-	m[base.ObjMonster] = loadImg("assets/img/monster.png")
-	m[base.ObjMe] = loadImg("assets/img/me.png")
+	var mm map[base.Posture]*ebiten.Image
+	mm = make(map[base.Posture]*ebiten.Image)
+	mm[base.PosNone] = loadImg("assets/img/undef.png")
+	m[base.ObjUndef] = mm
+	mm = make(map[base.Posture]*ebiten.Image)
+	mm[base.PosNone] = loadImg("assets/img/none.png")
+	m[base.ObjNone] = mm
+	mm = make(map[base.Posture]*ebiten.Image)
+	mm[base.PosNone] = loadImg("assets/img/bg.png")
+	m[base.ObjBG] = mm
+	mm = make(map[base.Posture]*ebiten.Image)
+	mm[base.PosNone] = loadImg("assets/img/meadow.png")
+	m[base.ObjMeadow] = mm
+	mm = make(map[base.Posture]*ebiten.Image)
+	mm[base.PosNone] = loadImg("assets/img/grass.png")
+	m[base.ObjGrass] = mm
+	mm = make(map[base.Posture]*ebiten.Image)
+	mm[base.PosNone] = loadImg("assets/img/tree.png")
+	m[base.ObjTree] = mm
+	mm = make(map[base.Posture]*ebiten.Image)
+	mm[base.PosNone] = loadImg("assets/img/box.png")
+	m[base.ObjBox] = mm
+	mm = make(map[base.Posture]*ebiten.Image)
+	mm[base.PosNone] = loadImg("assets/img/water.png")
+	m[base.ObjWater] = mm
+	mm = make(map[base.Posture]*ebiten.Image)
+	mm[base.PosNone] = loadImg("assets/img/sheep.png")
+	mm[base.PosDown] = loadImg("assets/img/sheep_pd.png")
+	mm[base.PosLeft] = loadImg("assets/img/sheep_pl.png")
+	mm[base.PosRight] = loadImg("assets/img/sheep_pr.png")
+	mm[base.PosUp] = loadImg("assets/img/sheep_pu.png")
+	m[base.ObjSheep] = mm
+	mm = make(map[base.Posture]*ebiten.Image)
+	mm[base.PosNone] = loadImg("assets/img/monster.png")
+	mm[base.PosDown] = loadImg("assets/img/monster_pd.png")
+	mm[base.PosLeft] = loadImg("assets/img/monster_pl.png")
+	mm[base.PosRight] = loadImg("assets/img/monster_pr.png")
+	mm[base.PosUp] = loadImg("assets/img/monster_pu.png")
+	m[base.ObjMonster] = mm
+	mm = make(map[base.Posture]*ebiten.Image)
+	mm[base.PosNone] = loadImg("assets/img/me.png")
+	mm[base.PosDown] = loadImg("assets/img/me_pd.png")
+	mm[base.PosLeft] = loadImg("assets/img/me_pl.png")
+	mm[base.PosRight] = loadImg("assets/img/me_pr.png")
+	mm[base.PosUp] = loadImg("assets/img/me_pu.png")
+	m[base.ObjMe] = mm
 }

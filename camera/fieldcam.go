@@ -77,5 +77,5 @@ func (c *FieldCam) DrawObject(screen *ebiten.Image, obj base.Object, pos base.Ve
 	drawY := c.TilePixels.X * pos.Y
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(drawX), float64(drawY))
-	screen.DrawImage(GetImg(obj.ObjectType()), op)
+	screen.DrawImage(GetImg(obj.ObjectType(), obj.Posture()), op)
 }

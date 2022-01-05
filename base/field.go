@@ -113,6 +113,22 @@ func (f *Field) Update() error {
 					lg.Warn(log.TypeValidation, "Field.Update", string(intelli.ObjectName()), "wrong move norm %d", newLoc.L1Norm(oldLoc))
 					continue
 				}
+				// change posture
+				// TODO: implement ActPosture
+				me := f.layerIntelligents().GetObject(oldLoc)
+				if act.MoveAmount.X == 1 {
+					me.SetPosture(PosRight)
+				}
+				if act.MoveAmount.X == -1 {
+					me.SetPosture(PosLeft)
+				}
+				if act.MoveAmount.Y == 1 {
+					me.SetPosture(PosDown)
+				}
+				if act.MoveAmount.Y == -1 {
+					me.SetPosture(PosUp)
+				}
+				// try to move
 				if !f.IsMovable(newLoc) {
 					continue
 				}

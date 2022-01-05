@@ -30,16 +30,19 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 	"text/template"
 
 	"gopkg.in/yaml.v2"
 )
 
 type ObjectData struct {
-	Name    string   `yaml:"name"`
-	Img     string   `yaml:"img"`
-	Flags   []string `yaml:"flags"`
-	FlagStr string   `yaml:"-"`
+	Name        string            `yaml:"name"`
+	Img         string            `yaml:"-"`
+	Flags       []string          `yaml:"flags"`
+	FlagStr     string            `yaml:"-"`
+	Posture     bool              `yaml:"posture"`
+	PostureImgs map[string]string `yaml:"-"`
 }
 
 func templateData(d []*ObjectData, tmpl, dst string) error {
@@ -85,6 +88,20 @@ func mergeFlags(d []*ObjectData) {
 	}
 }
 
+func setImgs(d []*ObjectData) {
+	for _, od := range d {
+		objName := strings.TrimPrefix(strings.ToLower(od.Name), "obj")
+		od.Img = objName + ".png"
+		if od.Posture {
+			od.PostureImgs = make(map[string]string)
+			od.PostureImgs["PosUp"] = objName + "_pu.png"
+			od.PostureImgs["PosLeft"] = objName + "_pl.png"
+			od.PostureImgs["PosDown"] = objName + "_pd.png"
+			od.PostureImgs["PosRight"] = objName + "_pr.png"
+		}
+	}
+}
+
 func main() {
 	src := os.Args[1]
 
@@ -106,6 +123,7 @@ func main() {
 		log.Fatal(err)
 	}
 	mergeFlags(d)
+	setImgs(d)
 	// for _, od := range d {
 	// 	fmt.Printf("%+v\n", od)
 	// }

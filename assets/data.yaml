@@ -1,44 +1,46 @@
+# ObjHoge needs hoge.png.
+# If ObjHoge has posture then also needs hoge_{pu, pl, pd, pr}.png.
 ---
 - name: ObjUndef
-  img: undef.png
   flags:
+  posture: false
 
 - name: ObjNone
-  img: none.png
   flags:
+  posture: false
 
 - name: ObjBG
-  img: bg.png
   flags: [BlockAll]
+  posture: false
 
 - name: ObjMeadow
-  img: meadow.png
   flags: [TerrainLand, TerrainSky]
+  posture: false
 
 - name: ObjGrass
-  img: grass.png
   flags: []
+  posture: false
 
 - name: ObjTree
-  img: tree.png
   flags: [BlockLand]
+  posture: false
 
 - name: ObjBox
-  img: box.png
   flags: [FlagItemBox]
+  posture: false
 
 - name: ObjWater
-  img: water.png
   flags: [TerrainSea, TerrainSky]
+  posture: false
 
 - name: ObjSheep
-  img: sheep.png
   flags: [FlagNPC]
+  posture: true
 
 - name: ObjMonster
-  img: monster.png
   flags: [FlagNPC]
+  posture: true
 
 - name: ObjMe
-  img: me.png
   flags: [FlagMe]
+  posture: true

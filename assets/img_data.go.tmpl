@@ -3,11 +3,19 @@
 package camera
 
 import (
+	"github.com/hajimehoshi/ebiten/v2"
+
 	"github.com/ebiiim/fantasy/base"
 )
 
 func initData() {
+	var mm map[base.Posture]*ebiten.Image
 	{{- range . }}
-	m[base.{{ .Name }}] = loadImg("assets/img/{{ .Img }}")
+	mm = make(map[base.Posture]*ebiten.Image)
+	mm[base.PosNone] = loadImg("assets/img/{{ .Img }}")
+	{{- if .Posture }}{{- range $k, $v := .PostureImgs }}
+	mm[base.{{ $k }}] = loadImg("assets/img/{{ $v }}")
+	{{- end }}{{- end }}
+	m[base.{{ .Name }}] = mm
 	{{- end }}
 }
