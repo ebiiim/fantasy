@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.5 - 2022-01-03
+
+Now interactive with the monster.
+
+### Added
+
+- the monster
+- pixel art-like fonts
+
 ## 0.0.4 - 2021-12-28
 
 Internal improvements.
