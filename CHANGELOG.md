@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.6 - 2022-01-05
+
+Now the characters can change their postures.
+
+### Added
+
+- postures
+
 ## 0.0.5 - 2022-01-03
 
 Now interactive with the monster.
